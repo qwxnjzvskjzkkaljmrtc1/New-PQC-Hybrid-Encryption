@@ -30,8 +30,8 @@
         <div class="modal-box">
             <p id="confirmText"></p>
             <div class="modal-actions">
-                <button id="confirmCancel" type="button" class="small-button">Batal</button>
-                <button id="confirmOk" type="button" class="small-button danger-solid">Lanjutkan</button>
+                <button id="confirmCancel" type="button" class="small-button" data-i18n="common.cancel">Batal</button>
+                <button id="confirmOk" type="button" class="small-button danger-solid" data-i18n="common.confirm">Lanjutkan</button>
             </div>
         </div>
     </div>
@@ -70,410 +70,431 @@
                     <circle cx="8" cy="50" r="1.3" fill="#8b5cf6"/>
                 </svg>
                 <h1>Q-EKH Protocol</h1>
-                <button id="themeToggleBtn" type="button" class="theme-toggle" aria-label="Ganti tema terang/gelap" title="Ganti tema">☀️</button>
-                <button id="panicBtn" type="button" class="panic-button" aria-label="Tombol panik: musnahkan data lokal dan muat ulang halaman" title="Panik: hapus kontak &amp; registry pad, kosongkan layar, muat ulang">🚨 Panik</button>
+                <button id="themeToggleBtn" type="button" class="theme-toggle" data-i18n-aria="header.themeAria" data-i18n-title="header.themeTitle" title="Ganti tema">☀️</button>
+                <button id="panicBtn" type="button" class="panic-button" data-i18n-aria="header.panicAria" data-i18n-title="header.panicTitle" data-i18n="header.panic" title="Panik: hapus kontak &amp; registry pad, kosongkan layar, muat ulang">🚨 Panik</button>
             </div>
-            <p>Enkripsi &amp; autentikasi hibrida pasca-kuantum (X25519 + ML-KEM-768, ditandatangani Ed25519 + SLH-DSA-192s). 100% lokal &amp; offline — tanpa CDN.</p>
+            <p data-i18n="header.sub">Enkripsi &amp; autentikasi hibrida pasca-kuantum (X25519 + ML-KEM-768, ditandatangani Ed25519 + SLH-DSA-192s). 100% lokal &amp; offline — tanpa CDN.</p>
         </header>
 
         <div id="selfTestBanner" class="selftest-banner" role="alert"></div>
 
         <div class="tabs" role="tablist">
-            <button class="tab-button active" data-tab="generate" role="tab" aria-selected="true">1. Buat Kunci</button>
-            <button class="tab-button" data-tab="encrypt" role="tab" aria-selected="false">2. Enkripsi</button>
-            <button class="tab-button" data-tab="decrypt" role="tab" aria-selected="false">3. Dekripsi</button>
-            <button class="tab-button" data-tab="radiogram" role="tab" aria-selected="false">4. Radiogram</button>
-            <button class="tab-button" data-tab="otp" role="tab" aria-selected="false">5. OTP &amp; Buku Pad</button>
-            <button class="tab-button" data-tab="contacts" role="tab" aria-selected="false">6. Kontak</button>
-            <button class="tab-button" data-tab="about" role="tab" aria-selected="false">7. Tentang</button>
+            <button class="tab-button active" data-tab="generate" role="tab" aria-selected="true" data-i18n="tabs.generate">1. Buat Kunci</button>
+            <button class="tab-button" data-tab="encrypt" role="tab" aria-selected="false" data-i18n="tabs.encrypt">2. Enkripsi</button>
+            <button class="tab-button" data-tab="decrypt" role="tab" aria-selected="false" data-i18n="tabs.decrypt">3. Dekripsi</button>
+            <button class="tab-button" data-tab="radiogram" role="tab" aria-selected="false" data-i18n="tabs.radiogram">4. Radiogram</button>
+            <button class="tab-button" data-tab="otp" role="tab" aria-selected="false" data-i18n="tabs.otp">5. OTP &amp; Buku Pad</button>
+            <button class="tab-button" data-tab="contacts" role="tab" aria-selected="false" data-i18n="tabs.contacts">6. Kontak</button>
+            <button class="tab-button" data-tab="about" role="tab" aria-selected="false" data-i18n="tabs.about">7. Tentang</button>
         </div>
 
         <main>
             <div id="generate-view" class="content-section active" role="tabpanel" tabindex="-1">
-                <h2>Pembuatan Identitas Hibrida</h2>
-                <p class="description">Membuat 4 pasang kunci sekaligus: X25519 + ML-KEM-768 untuk enkripsi, serta Ed25519 dan SLH-DSA-192s untuk tanda tangan. Simpan Kunci Privat Anda dengan sangat aman dan bagikan Kunci Publik + Fingerprint kepada lawan bicara lewat jalur terpisah.</p>
+                <h2 data-i18n="gen.title">Pembuatan Identitas Hibrida</h2>
+                <p class="description" data-i18n="gen.desc">Membuat 4 pasang kunci sekaligus: X25519 + ML-KEM-768 untuk enkripsi, serta Ed25519 dan SLH-DSA-192s untuk tanda tangan. Simpan Kunci Privat Anda dengan sangat aman dan bagikan Kunci Publik + Fingerprint kepada lawan bicara lewat jalur terpisah.</p>
                 <div class="input-group passphrase-panel">
-                    <label for="genPassphrase">Passphrase Kunci Privat (opsional)</label>
-                    <input id="genPassphrase" type="password" autocomplete="new-password" placeholder="Kosongkan untuk kunci tanpa enkripsi; jangan lupa passphrase ini.">
-                    <p class="fingerprint-hint">Passphrase tidak dapat dipulihkan. Kunci privat terenkripsi memakai Argon2id (dijalankan di Web Worker — UI tidak membeku).</p>
+                    <label for="genPassphrase" data-i18n="gen.passLabel">Passphrase Kunci Privat (opsional)</label>
+                    <input id="genPassphrase" type="password" autocomplete="new-password" placeholder="Kosongkan untuk kunci tanpa enkripsi; jangan lupa passphrase ini." data-i18n-ph="gen.passPh">
+                    <p class="fingerprint-hint" data-i18n="gen.passHint">Passphrase tidak dapat dipulihkan. Kunci privat terenkripsi memakai Argon2id (dijalankan di Web Worker — UI tidak membeku).</p>
                 </div>
                 <div class="input-group passphrase-panel">
-                    <label for="genExpires">Masa berlaku kunci (opsional)</label>
+                    <label for="genExpires" data-i18n="gen.expiresLabel">Masa berlaku kunci (opsional)</label>
                     <input id="genExpires" type="date">
-                    <p class="fingerprint-hint">Bila diisi, tanggal ini ikut tercantum di Kunci Publik dan aplikasi akan mengingatkan lawan bicara saat kunci lewat masa berlakunya. Rotasi berkala membatasi dampak bila kunci bocor.</p>
+                    <p class="fingerprint-hint" data-i18n="gen.expiresHint">Bila diisi, tanggal ini ikut tercantum di Kunci Publik dan aplikasi akan mengingatkan lawan bicara saat kunci lewat masa berlakunya. Rotasi berkala membatasi dampak bila kunci bocor.</p>
                 </div>
-                <button id="generateBtn" class="action-button">Buat Pasangan Kunci Hibrida Baru</button>
+                <button id="generateBtn" class="action-button" data-i18n="gen.btn">Buat Pasangan Kunci Hibrida Baru</button>
                 <div id="genProgress" class="progress-bar"><div id="genProgressFill" class="progress-fill"></div></div>
 
                 <div class="input-group block-gap">
-                    <label for="genPublicKey">Kunci Publik Hibrida (JSON - Bagikan ini)</label>
+                    <label for="genPublicKey" data-i18n="gen.pubLabel">Kunci Publik Hibrida (JSON - Bagikan ini)</label>
                     <div class="output-group">
-                        <textarea id="genPublicKey" rows="7" readonly placeholder="Kunci Publik gabungan akan dibuat di sini..."></textarea>
-                        <button id="copyGenPublicBtn" class="copy-button" aria-label="Salin kunci publik">Salin</button>
+                        <textarea id="genPublicKey" rows="7" readonly placeholder="Kunci Publik gabungan akan dibuat di sini..." data-i18n-ph="gen.pubPh"></textarea>
+                        <button id="copyGenPublicBtn" class="copy-button" data-i18n-aria="gen.pubCopyAria" data-i18n="common.copy" aria-label="Salin kunci publik">Salin</button>
                     </div>
                     <div class="button-row">
-                        <button id="downloadGenPublicBtn" type="button" class="small-button">⬇ Unduh kunci publik</button>
+                        <button id="downloadGenPublicBtn" type="button" class="small-button" data-i18n="gen.downloadPub">⬇ Unduh kunci publik</button>
                     </div>
                     <div class="fingerprint-group">
-                        <label>Fingerprint Identitas (untuk verifikasi anti-MITM)</label>
-                        <div id="genFingerprint" class="fingerprint-box" aria-live="polite">Buat kunci untuk melihat fingerprint...</div>
+                        <label data-i18n="gen.fpLabel">Fingerprint Identitas (untuk verifikasi anti-MITM)</label>
+                        <div id="genFingerprint" class="fingerprint-box" aria-live="polite" data-i18n-live>Buat kunci untuk melihat fingerprint...</div>
                         <div class="button-row">
-                            <button id="copyGenFingerprintBtn" class="copy-button inline-copy" type="button">Salin fingerprint</button>
+                            <button id="copyGenFingerprintBtn" class="copy-button inline-copy" type="button" data-i18n="gen.fpCopy">Salin fingerprint</button>
                         </div>
-                        <p class="fingerprint-hint">Bacakan atau kirim fingerprint ini ke lawan bicara Anda lewat jalur lain (telepon, tatap muka, chat terpisah) — atau tunjukkan QR di bawah saat bertemu langsung. Kotak gambar di sampingnya adalah <strong>sidik visual</strong> (randomart) dari fingerprint yang sama — mata manusia mencocokkan gambar jauh lebih cepat daripada 64 karakter hex. Ini yang membuat tanda tangan benar-benar berarti.</p>
+                        <p class="fingerprint-hint" data-i18n="gen.fpHint">Bacakan atau kirim fingerprint ini ke lawan bicara Anda lewat jalur lain (telepon, tatap muka, chat terpisah) — atau tunjukkan QR di bawah saat bertemu langsung. Kotak gambar di sampingnya adalah <strong>sidik visual</strong> (randomart) dari fingerprint yang sama — mata manusia mencocokkan gambar jauh lebih cepat daripada 64 karakter hex. Ini yang membuat tanda tangan benar-benar berarti.</p>
                         <div id="genQrBox" class="qr-box"></div>
                     </div>
                 </div>
 
                  <div class="input-group">
-                    <label for="genPrivateKey">Kunci Privat Hibrida (JSON - JAGA KERAHASIAANNYA)</label>
+                    <label for="genPrivateKey" data-i18n="gen.privLabel">Kunci Privat Hibrida (JSON - JAGA KERAHASIAANNYA)</label>
                     <div class="output-group">
-                        <textarea id="genPrivateKey" rows="7" readonly placeholder="Kunci Privat gabungan akan dibuat di sini..."></textarea>
-                        <button id="copyGenPrivateBtn" class="copy-button" aria-label="Salin kunci privat">Salin</button>
+                        <textarea id="genPrivateKey" rows="7" readonly placeholder="Kunci Privat gabungan akan dibuat di sini..." data-i18n-ph="gen.privPh"></textarea>
+                        <button id="copyGenPrivateBtn" class="copy-button" data-i18n-aria="gen.privCopyAria" data-i18n="common.copy" aria-label="Salin kunci privat">Salin</button>
                     </div>
                     <div class="button-row">
-                        <button id="downloadGenPrivateBtn" type="button" class="small-button">⬇ Unduh kunci privat</button>
+                        <button id="downloadGenPrivateBtn" type="button" class="small-button" data-i18n="gen.downloadPriv">⬇ Unduh kunci privat</button>
                     </div>
                 </div>
             </div>
 
             <div id="encrypt-view" class="content-section" role="tabpanel" tabindex="-1">
-                <h2>Enkripsi &amp; Tanda Tangan Pesan</h2>
-                <p class="description">Pilih kontak penerima (atau tempel Kunci Publik-nya) dan Kunci Privat Anda sendiri (dipakai untuk menandatangani, bukan untuk enkripsi).</p>
+                <h2 data-i18n="enc.title">Enkripsi &amp; Tanda Tangan Pesan</h2>
+                <p class="description" data-i18n="enc.desc">Pilih kontak penerima (atau tempel Kunci Publik-nya) dan Kunci Privat Anda sendiri (dipakai untuk menandatangani, bukan untuk enkripsi).</p>
                 <div class="input-group">
-                    <label for="contactSelectEncrypt">Penerima dari Buku Kontak</label>
+                    <label for="contactSelectEncrypt" data-i18n="enc.contactLabel">Penerima dari Buku Kontak</label>
                     <select id="contactSelectEncrypt"></select>
                     <p id="contactWarnEncrypt" class="contact-warn" aria-live="polite"></p>
                 </div>
                 <div class="input-group">
-                    <label for="publicKey">Kunci Publik Hibrida Penerima (JSON)</label>
-                    <textarea id="publicKey" rows="6" placeholder="Tempel Kunci Publik Hibrida penerima di sini..."></textarea>
+                    <label for="publicKey" data-i18n="enc.pubLabel">Kunci Publik Hibrida Penerima (JSON)</label>
+                    <textarea id="publicKey" rows="6" placeholder="Tempel Kunci Publik Hibrida penerima di sini..." data-i18n-ph="enc.pubPh"></textarea>
                     <div class="fingerprint-group">
-                        <label>Fingerprint Kunci yang Ditempel</label>
+                        <label data-i18n="enc.fpLabel">Fingerprint Kunci yang Ditempel</label>
                         <div id="recipientFingerprint" class="fingerprint-box" aria-live="polite">—</div>
-                        <p class="fingerprint-hint">Cocokkan dengan fingerprint yang dibacakan langsung oleh penerima sebelum mengirim pesan rahasia.</p>
+                        <p class="fingerprint-hint" data-i18n="enc.fpHint">Cocokkan dengan fingerprint yang dibacakan langsung oleh penerima sebelum mengirim pesan rahasia.</p>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label for="senderPrivateKey">Kunci Privat Anda (untuk menandatangani pesan ini)</label>
-                    <textarea id="senderPrivateKey" rows="6" placeholder="Tempel Kunci Privat Hibrida Anda sendiri di sini..."></textarea>
+                    <label for="senderPrivateKey" data-i18n="enc.privLabel">Kunci Privat Anda (untuk menandatangani pesan ini)</label>
+                    <textarea id="senderPrivateKey" rows="6" placeholder="Tempel Kunci Privat Hibrida Anda sendiri di sini..." data-i18n-ph="enc.privPh"></textarea>
                 </div>
                 <div class="input-group">
-                    <label for="senderKeyPassphrase">Passphrase Kunci Privat Anda</label>
-                    <input id="senderKeyPassphrase" type="password" autocomplete="current-password" placeholder="Isi jika Kunci Privat terenkripsi.">
+                    <label for="senderKeyPassphrase" data-i18n="enc.passLabel">Passphrase Kunci Privat Anda</label>
+                    <input id="senderKeyPassphrase" type="password" autocomplete="current-password" placeholder="Isi jika Kunci Privat terenkripsi." data-i18n-ph="enc.passPh">
                 </div>
                 <div class="input-group">
-                    <label for="plainText">Teks Biasa (Plaintext)</label>
-                    <textarea id="plainText" rows="4" placeholder="Tulis pesan rahasia Anda di sini..."></textarea>
+                    <label for="plainText" data-i18n="enc.plainLabel">Teks Biasa (Plaintext)</label>
+                    <textarea id="plainText" rows="4" placeholder="Tulis pesan rahasia Anda di sini..." data-i18n-ph="enc.plainPh"></textarea>
                     <p id="charCount" class="fingerprint-hint"></p>
                 </div>
                 <div class="input-group">
-                    <label for="bucketSelect">Padding ukuran (anti analisis ukuran)</label>
+                    <label for="bucketSelect" data-i18n="enc.bucketLabel">Padding ukuran (anti analisis ukuran)</label>
                     <select id="bucketSelect">
-                        <option value="0" selected>Blok acak 512 B (default — disarankan)</option>
-                        <option value="32768">Bucket konstan 32 KB</option>
-                        <option value="65536">Bucket konstan 64 KB</option>
-                        <option value="131072">Bucket konstan 128 KB</option>
-                        <option value="262144">Bucket konstan 256 KB</option>
+                        <option value="0" selected data-i18n="enc.bucketOpt0">Blok acak 512 B (default — disarankan)</option>
+                        <option value="32768" data-i18n="enc.bucketOpt32">Bucket konstan 32 KB</option>
+                        <option value="65536" data-i18n="enc.bucketOpt64">Bucket konstan 64 KB</option>
+                        <option value="131072" data-i18n="enc.bucketOpt128">Bucket konstan 128 KB</option>
+                        <option value="262144" data-i18n="enc.bucketOpt256">Bucket konstan 256 KB</option>
                     </select>
-                    <p class="fingerprint-hint">Bucket konstan membuat semua pesan tampak berukuran persis kelipatan N KB — berguna bila pengamat mencatat ukuran burst Anda dengan teliti. Konsekuensi: ciphertext lebih besar; pesan melebihi bucket akan ditolak.</p>
+                    <p class="fingerprint-hint" data-i18n="enc.bucketHint">Bucket konstan membuat semua pesan tampak berukuran persis kelipatan N KB — berguna bila pengamat mencatat ukuran burst Anda dengan teliti. Konsekuensi: ciphertext lebih besar; pesan melebihi bucket akan ditolak.</p>
                 </div>
-                <button id="encryptBtn" class="action-button">Enkripsi &amp; Tandatangani Pesan</button>
+                <button id="encryptBtn" class="action-button" data-i18n="enc.btn">Enkripsi &amp; Tandatangani Pesan</button>
                 <div id="encryptProgress" class="progress-bar"><div id="encryptProgressFill" class="progress-fill"></div></div>
 
                 <div class="input-group block-gap">
-                    <label for="encryptedText">Ciphertext Hibrida (Base64)</label>
+                    <label for="encryptedText" data-i18n="enc.outLabel">Ciphertext Hibrida (Base64)</label>
                     <div class="output-group">
-                        <textarea id="encryptedText" rows="7" readonly placeholder="Hasil enkripsi + tanda tangan akan muncul di sini..."></textarea>
-                        <button id="copyEncryptedBtn" class="copy-button" aria-label="Salin ciphertext">Salin</button>
+                        <textarea id="encryptedText" rows="7" readonly placeholder="Hasil enkripsi + tanda tangan akan muncul di sini..." data-i18n-ph="enc.outPh"></textarea>
+                        <button id="copyEncryptedBtn" class="copy-button" data-i18n-aria="enc.copyAria" data-i18n="common.copy" aria-label="Salin ciphertext">Salin</button>
                     </div>
                     <div class="button-row">
-                        <button id="downloadEncryptedBtn" type="button" class="small-button">⬇ Unduh ciphertext</button>
+                        <button id="downloadEncryptedBtn" type="button" class="small-button" data-i18n="enc.download">⬇ Unduh ciphertext</button>
+                        <button id="downloadEncryptedBinBtn" type="button" class="small-button" data-i18n="enc.downloadBin" data-i18n-title="enc.downloadBinTitle" title="Format biner mentah QEKHB1 — ~25% lebih kecil, untuk toolchain radio">⬇ Unduh .qekhb (biner mentah)</button>
                     </div>
-                    <p class="fingerprint-hint">Untuk dikirim lewat radio (voice/CW): buka tab <strong>4. Radiogram</strong> untuk konversi ke grup huruf + estimasi durasi pancar.</p>
+                    <p class="fingerprint-hint" data-i18n="enc.hintRadio">Untuk dikirim lewat radio (voice/CW): buka tab <strong>4. Radiogram</strong> untuk konversi ke grup huruf + estimasi durasi pancar. <strong>.qekhb</strong> = envelope v5 dalam bentuk biner mentah (tanpa base64/JSON) — untuk toolchain radio sendiri; bisa dibuka lagi di tab 3.</p>
                 </div>
 
-                <h3 class="section-sub">Enkripsi FILE (chunked .qekhf)</h3>
-                <p class="description">File dipotong per 64 KiB dan tiap potongan di-AES-256-GCM (nonce = prefix acak ‖ counter ‖ flagLAST, ala STREAM); kunci file acak 32 byte disegel sebagai pesan v5 ke penerima di atas — jadi tanda tangan Anda ikut terbawa. Satu potongan rusak = gagal total, tidak ada plaintext parsial.</p>
-                <div id="fileDropZone" class="drop-zone" role="button" tabindex="0" aria-label="Pilih atau seret file untuk dienkripsi">
-                    Seret &amp; letakkan file di sini, atau klik untuk memilih.
+                <h3 class="section-sub" data-i18n="enc.fileTitle">Enkripsi FILE (chunked .qekhf)</h3>
+                <p class="description" data-i18n="enc.fileDesc">File dipotong per 64 KiB dan tiap potongan di-AES-256-GCM (nonce = prefix acak ‖ counter ‖ flagLAST, ala STREAM); kunci file acak 32 byte disegel sebagai pesan v5 ke penerima di atas — jadi tanda tangan Anda ikut terbawa. Satu potongan rusak = gagal total, tidak ada plaintext parsial.</p>
+                <div id="fileDropZone" class="drop-zone" role="button" tabindex="0" data-i18n-aria="enc.dropzoneAria" aria-label="Pilih atau seret file untuk dienkripsi">
+                    <span data-i18n="enc.dropzone">Seret &amp; letakkan file di sini, atau klik untuk memilih.</span>
                     <input id="fileEncryptInput" type="file" hidden>
                 </div>
                 <p id="fileEncryptInfo" class="fingerprint-hint"></p>
-                <button id="fileEncryptBtn" class="action-button">Enkripsi File &amp; Unduh .qekhf</button>
+                <button id="fileEncryptBtn" class="action-button" data-i18n="enc.fileBtn">Enkripsi File &amp; Unduh .qekhf</button>
                 <div id="fileEncryptProgress" class="progress-bar"><div id="fileEncryptProgressFill" class="progress-fill"></div></div>
             </div>
 
             <div id="decrypt-view" class="content-section" role="tabpanel" tabindex="-1">
-                <h2>Dekripsi &amp; Verifikasi Pesan</h2>
-                <p class="description">Gunakan Kunci Privat Anda untuk membuka pesan. Isi juga Kunci Publik Pengirim (opsional, tapi sangat disarankan) untuk memverifikasi tanda tangannya.</p>
+                <h2 data-i18n="dec.title">Dekripsi &amp; Verifikasi Pesan</h2>
+                <p class="description" data-i18n="dec.desc">Gunakan Kunci Privat Anda untuk membuka pesan. Isi juga Kunci Publik Pengirim (opsional, tapi sangat disarankan) untuk memverifikasi tanda tangannya.</p>
                 <div class="input-group">
-                    <label for="privateKey">Kunci Privat Hibrida Anda (JSON)</label>
-                    <textarea id="privateKey" rows="6" placeholder="Tempel Kunci Privat Hibrida berformat JSON Anda di sini..."></textarea>
+                    <label for="privateKey" data-i18n="dec.privLabel">Kunci Privat Hibrida Anda (JSON)</label>
+                    <textarea id="privateKey" rows="6" placeholder="Tempel Kunci Privat Hibrida berformat JSON Anda di sini..." data-i18n-ph="dec.privPh"></textarea>
                 </div>
                 <div class="input-group">
-                    <label for="privateKeyPassphrase">Passphrase Kunci Privat Anda</label>
-                    <input id="privateKeyPassphrase" type="password" autocomplete="current-password" placeholder="Isi jika Kunci Privat terenkripsi.">
+                    <label for="privateKeyPassphrase" data-i18n="dec.passLabel">Passphrase Kunci Privat Anda</label>
+                    <input id="privateKeyPassphrase" type="password" autocomplete="current-password" placeholder="Isi jika Kunci Privat terenkripsi." data-i18n-ph="enc.passPh">
                 </div>
                 <div class="input-group">
-                    <label for="cipherText">Ciphertext Hibrida (Base64)</label>
-                    <textarea id="cipherText" rows="7" placeholder="Tempel ciphertext dari pengirim..."></textarea>
+                    <label for="cipherText" data-i18n="dec.cipherLabel">Ciphertext Hibrida (Base64)</label>
+                    <textarea id="cipherText" rows="7" placeholder="Tempel ciphertext dari pengirim..." data-i18n-ph="dec.cipherPh"></textarea>
+                    <div class="button-row">
+                        <button id="cipherBinBtn" type="button" class="small-button" data-i18n="dec.openBin" data-i18n-title="dec.openBinTitle" title="Buka file biner mentah QEKHB1 (hasil &quot;Unduh .qekhb&quot; tab 2) — otomatis dikonversi ke base64">📂 Buka file .qekhb (biner mentah)</button>
+                        <input id="cipherBinInput" type="file" accept=".qekhb,application/octet-stream" hidden>
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label for="contactSelectDecrypt">Pengirim dari Buku Kontak</label>
+                    <label for="contactSelectDecrypt" data-i18n="dec.contactLabel">Pengirim dari Buku Kontak</label>
                     <select id="contactSelectDecrypt"></select>
                     <p id="contactWarnDecrypt" class="contact-warn" aria-live="polite"></p>
                 </div>
                 <div class="input-group">
-                    <label for="senderVerifyKey">Kunci Publik Pengirim (opsional, untuk verifikasi tanda tangan)</label>
-                    <textarea id="senderVerifyKey" rows="6" placeholder="Tempel Kunci Publik Hibrida milik pengirim yang SUDAH Anda verifikasi fingerprint-nya..."></textarea>
+                    <label for="senderVerifyKey" data-i18n="dec.senderLabel">Kunci Publik Pengirim (opsional, untuk verifikasi tanda tangan)</label>
+                    <textarea id="senderVerifyKey" rows="6" placeholder="Tempel Kunci Publik Hibrida milik pengirim yang SUDAH Anda verifikasi fingerprint-nya..." data-i18n-ph="dec.senderPh"></textarea>
                     <div class="fingerprint-group">
-                        <label>Fingerprint Kunci yang Ditempel</label>
+                        <label data-i18n="enc.fpLabel">Fingerprint Kunci yang Ditempel</label>
                         <div id="senderVerifyFingerprint" class="fingerprint-box" aria-live="polite">—</div>
-                        <p class="fingerprint-hint">Harus cocok dengan fingerprint yang sudah Anda verifikasi langsung dengan pengirim sebelumnya.</p>
+                        <p class="fingerprint-hint" data-i18n="dec.fpHint">Harus cocok dengan fingerprint yang sudah Anda verifikasi langsung dengan pengirim sebelumnya.</p>
                     </div>
                 </div>
-                <button id="decryptBtn" class="action-button">Dekripsi Pesan</button>
+                <button id="decryptBtn" class="action-button" data-i18n="dec.btn">Dekripsi Pesan</button>
                 <div id="decryptProgress" class="progress-bar"><div id="decryptProgressFill" class="progress-fill"></div></div>
 
                 <div class="input-group block-gap">
-                    <label for="decryptedText">Teks Asli (Decrypted)</label>
+                    <label for="decryptedText" data-i18n="dec.outLabel">Teks Asli (Decrypted)</label>
                     <div class="output-group">
-                        <textarea id="decryptedText" rows="4" readonly placeholder="Hasil dekripsi akan muncul di sini..."></textarea>
-                        <button id="copyDecryptedBtn" class="copy-button" aria-label="Salin hasil dekripsi">Salin</button>
+                        <textarea id="decryptedText" rows="4" readonly placeholder="Hasil dekripsi akan muncul di sini..." data-i18n-ph="dec.outPh"></textarea>
+                        <button id="copyDecryptedBtn" class="copy-button" data-i18n-aria="dec.copyAria" data-i18n="common.copy" aria-label="Salin hasil dekripsi">Salin</button>
                     </div>
                     <div id="verificationStatus" class="verification-status" aria-live="polite"></div>
                     <div id="decryptMeta" class="fingerprint-hint"></div>
                 </div>
 
-                <h3 class="section-sub">Dekripsi FILE .qekhf</h3>
-                <p class="description">Memakai Kunci Privat dan Kunci Publik Pengirim di atas. Setiap potongan diautentikasi — bila satu pun rusak/diubah, file DITOLAK utuh (tidak ada hasil parsial).</p>
+                <h3 class="section-sub" data-i18n="dec.fileTitle">Dekripsi FILE .qekhf</h3>
+                <p class="description" data-i18n="dec.fileDesc">Memakai Kunci Privat dan Kunci Publik Pengirim di atas. Setiap potongan diautentikasi — bila satu pun rusak/diubah, file DITOLAK utuh (tidak ada hasil parsial).</p>
                 <div class="input-group">
-                    <label for="fileDecryptInput">File .qekhf</label>
+                    <label for="fileDecryptInput" data-i18n="dec.fileLabel">File .qekhf</label>
                     <input id="fileDecryptInput" type="file" accept=".qekhf,application/octet-stream">
                 </div>
-                <button id="fileDecryptBtn" class="action-button">Dekripsi File &amp; Unduh Hasil</button>
+                <button id="fileDecryptBtn" class="action-button" data-i18n="dec.fileBtn">Dekripsi File &amp; Unduh Hasil</button>
                 <div id="fileDecryptProgress" class="progress-bar"><div id="fileDecryptProgressFill" class="progress-fill"></div></div>
                 <div id="fileDecryptStatus" class="verification-status" aria-live="polite"></div>
             </div>
 
             <div id="radiogram-view" class="content-section" role="tabpanel" tabindex="-1">
-                <h2>Mode Radiogram (Burst)</h2>
-                <p class="description">Konversi ciphertext Q-EKH menjadi grup 5 huruf kapital (base32 RFC 4648) yang bisa dibacakan lewat voice/CW dan disalin tangan tanpa ambiguitas. Sebelum memencet PTT, lihat estimasi durasi pancar — makin singkat di udara, makin sulit dilokasi RDF.</p>
+                <h2 data-i18n="rad.title">Mode Radiogram (Burst)</h2>
+                <p class="description" data-i18n="rad.desc">Konversi ciphertext Q-EKH menjadi grup 5 huruf kapital (base32 RFC 4648) yang bisa dibacakan lewat voice/CW dan disalin tangan tanpa ambiguitas. Sebelum memencet PTT, lihat estimasi durasi pancar — makin singkat di udara, makin sulit dilokasi RDF.</p>
                 <div class="input-group">
-                    <label for="radioInput">Ciphertext (base64) — atau grup huruf untuk arah sebaliknya</label>
-                    <textarea id="radioInput" rows="5" placeholder="Tempel ciphertext base64 dari tab Enkripsi... (grup huruf juga dikenali otomatis dan diubah balik ke base64)"></textarea>
+                    <label for="radioInput" data-i18n="rad.inputLabel">Ciphertext (base64) — atau grup huruf untuk arah sebaliknya</label>
+                    <textarea id="radioInput" rows="5" placeholder="Tempel ciphertext base64 dari tab Enkripsi... (grup huruf juga dikenali otomatis dan diubah balik ke base64)" data-i18n-ph="rad.inputPh"></textarea>
                 </div>
-                <button id="radioConvertBtn" class="action-button">Konversi</button>
+                <button id="radioConvertBtn" class="action-button" data-i18n="rad.btn">Konversi</button>
                 <div class="input-group block-gap">
-                    <label for="radioOutput">Hasil Radiogram</label>
+                    <label for="radioOutput" data-i18n="rad.outLabel">Hasil Radiogram</label>
                     <div class="output-group">
-                        <textarea id="radioOutput" rows="8" readonly placeholder="QEKH5 ... grup huruf akan muncul di sini..."></textarea>
-                        <button id="copyRadioBtn" class="copy-button" aria-label="Salin radiogram">Salin</button>
+                        <textarea id="radioOutput" rows="8" readonly placeholder="QEKH5 ... grup huruf akan muncul di sini..." data-i18n-ph="rad.outPh"></textarea>
+                        <button id="copyRadioBtn" class="copy-button" data-i18n-aria="rad.copyAria" data-i18n="common.copy" aria-label="Salin radiogram">Salin</button>
                     </div>
                     <div class="button-row">
-                        <button id="downloadRadioBtn" type="button" class="small-button">⬇ Unduh radiogram</button>
-                        <button id="printRadioBtn" type="button" class="small-button">🖨 Cetak lembar salin-tangan</button>
+                        <button id="downloadRadioBtn" type="button" class="small-button" data-i18n="rad.download">⬇ Unduh radiogram</button>
+                        <button id="printRadioBtn" type="button" class="small-button" data-i18n="rad.print">🖨 Cetak lembar salin-tangan</button>
                     </div>
                 </div>
                 <div class="input-group radio-estimator">
-                    <label for="radioRate">Laju pancar</label>
+                    <label for="radioRate" data-i18n="rad.rateLabel">Laju pancar</label>
                     <div class="estimator-row">
                         <input id="radioRate" type="number" min="1" value="15">
                         <select id="radioUnit">
-                            <option value="wpm" selected>WPM (kata/menit, PARIS)</option>
-                            <option value="bps">bps (bit/detik)</option>
+                            <option value="wpm" selected data-i18n="rad.wpmOpt">WPM (kata/menit, PARIS)</option>
+                            <option value="bps" data-i18n="rad.bpsOpt">bps (bit/detik)</option>
                         </select>
                     </div>
                     <div id="radioEstimate" class="radio-estimate" aria-live="polite"></div>
                 </div>
                 <div class="input-group cw-controls">
-                    <label for="cwWpm">Putar sebagai CW (morse) — nada 600 Hz, semua lokal</label>
+                    <label for="cwWpm" data-i18n="rad.cwLabel">Putar sebagai CW (morse) — nada 600 Hz, semua lokal</label>
                     <div class="estimator-row">
-                        <input id="cwWpm" type="number" min="5" max="60" value="15" title="Kecepatan CW dalam WPM (PARIS)">
-                        <button id="cwPlayBtn" type="button" class="small-button">▶ Putar CW</button>
-                        <button id="cwWavBtn" type="button" class="small-button">⬇ Unduh .wav</button>
+                        <input id="cwWpm" type="number" min="5" max="60" value="15" title="Kecepatan CW dalam WPM (PARIS)" data-i18n-title="rad.cwTitle">
+                        <button id="cwPlayBtn" type="button" class="small-button" data-i18n="rad.cwPlay">▶ Putar CW</button>
+                        <button id="cwWavBtn" type="button" class="small-button" data-i18n="rad.cwWav">⬇ Unduh .wav</button>
                     </div>
-                    <p class="fingerprint-hint">Timing PARIS (unit = 1200/WPM ms). Header "QEKH5 … GRUP" ikut dimainkan sebagai penanda di udara. File .wav bisa diputar ke pemancar/HP lain — seluruh radiogram terpancar tanpa mengetik ulang.</p>
+                    <p class="fingerprint-hint" data-i18n="rad.cwHint">Timing PARIS (unit = 1200/WPM ms). Header "QEKH5 … GRUP" ikut dimainkan sebagai penanda di udara. File .wav bisa diputar ke pemancar/HP lain — seluruh radiogram terpancar tanpa mengetik ulang.</p>
                 </div>
 
-                <h3 class="section-sub">Jadwal FHSS dari kunci bersama (C.4)</h3>
-                <p class="description">Tabel waktu → kanal pseudo-acak yang <strong>sama di kedua pihak</strong>, diturunkan dari kunci bersama + tanggal lewat HKDF-SHA256. Murni tampilan — radio tetap Anda operasikan manual sesuai tabel. Kedua pihak wajib memakai kunci, tanggal, jumlah kanal, dan durasi slot yang persis sama.</p>
+                <h3 class="section-sub" data-i18n="rad.fhssTitle">Jadwal FHSS dari kunci bersama (C.4)</h3>
+                <p class="description" data-i18n="rad.fhssDesc">Tabel waktu → kanal pseudo-acak yang <strong>sama di kedua pihak</strong>, diturunkan dari kunci bersama + tanggal lewat HKDF-SHA256. Murni tampilan — radio tetap Anda operasikan manual sesuai tabel. Kedua pihak wajib memakai kunci, tanggal, jumlah kanal, dan durasi slot yang persis sama.</p>
                 <div class="input-group">
-                    <label for="fhssKey">Kunci bersama (teks rahasia apa pun — mis. passphrase yang disepakati tatap muka)</label>
-                    <input id="fhssKey" type="password" autocomplete="off" placeholder="Kunci bersama...">
+                    <label for="fhssKey" data-i18n="rad.fhssKeyLabel">Kunci bersama (teks rahasia apa pun — mis. passphrase yang disepakati tatap muka)</label>
+                    <input id="fhssKey" type="password" autocomplete="off" placeholder="Kunci bersama..." data-i18n-ph="rad.fhssKeyPh">
                 </div>
                 <div class="input-group">
                     <div class="estimator-row">
-                        <input id="fhssDate" type="date" title="Tanggal jadwal">
-                        <input id="fhssChannels" type="number" min="2" max="256" value="16" title="Jumlah kanal">
+                        <input id="fhssDate" type="date" title="Tanggal jadwal" data-i18n-title="rad.fhssDateTitle">
+                        <input id="fhssChannels" type="number" min="2" max="256" value="16" title="Jumlah kanal" data-i18n-title="rad.fhssChTitle">
                         <select id="fhssSlot">
-                            <option value="60">slot 60 menit</option>
-                            <option value="30" selected>slot 30 menit</option>
-                            <option value="15">slot 15 menit</option>
-                            <option value="10">slot 10 menit</option>
+                            <option value="60" data-i18n="rad.fhssSlot60">slot 60 menit</option>
+                            <option value="30" selected data-i18n="rad.fhssSlot30">slot 30 menit</option>
+                            <option value="15" data-i18n="rad.fhssSlot15">slot 15 menit</option>
+                            <option value="10" data-i18n="rad.fhssSlot10">slot 10 menit</option>
                         </select>
-                        <button id="fhssBtn" type="button" class="small-button">Buat jadwal</button>
+                        <button id="fhssBtn" type="button" class="small-button" data-i18n="rad.fhssBtn">Buat jadwal</button>
                     </div>
                 </div>
                 <div id="fhssTable" class="fhss-grid" aria-live="polite"></div>
             </div>
 
             <div id="otp-view" class="content-section" role="tabpanel" tabindex="-1">
-                <h2>OTP Terautentikasi &amp; Buku Pad</h2>
+                <h2 data-i18n="otp.title">OTP Terautentikasi &amp; Buku Pad</h2>
                 <div class="important-notice otp-warning">
-                    <h3>⚠️ OTP-v2: pad acak + autentikasi + anti pemakaian ulang</h3>
-                    <p>XOR dengan pad acak satu-kali sudah sempurna secara teori (Shannon), dan itu tidak berubah. Yang ditambahkan di sini: <strong>tag HMAC-SHA256</strong> (kuncinya dari segmen buku yang terpisah) supaya perubahan ciphertext terdeteksi, <strong>registry anti-reuse</strong> supaya pad tak pernah dipakai dua kali, dan penolakan otomatis saat buku habis. Catatan jujur: autentikasinya kuat secara komputasional ("setara AES"), bukan information-theoretic. Distribusi buku pad tetap harga mati: tukar file .qpad secara aman/tatap muka.</p>
+                    <h3 data-i18n="otp.warnTitle">⚠️ OTP-v2: pad acak + autentikasi + anti pemakaian ulang</h3>
+                    <p data-i18n="otp.warnText">XOR dengan pad acak satu-kali sudah sempurna secara teori (Shannon), dan itu tidak berubah. Yang ditambahkan di sini: <strong>tag HMAC-SHA256</strong> (kuncinya dari segmen buku yang terpisah) supaya perubahan ciphertext terdeteksi, <strong>registry anti-reuse</strong> supaya pad tak pernah dipakai dua kali, dan penolakan otomatis saat buku habis. Catatan jujur: autentikasinya kuat secara komputasional ("setara AES"), bukan information-theoretic. Distribusi buku pad tetap harga mati: tukar file .qpad secara aman/tatap muka.</p>
                 </div>
 
-                <h3 class="section-sub">1. Buku Pad</h3>
+                <h3 class="section-sub" data-i18n="otp.bookTitle">1. Buku Pad</h3>
                 <div id="otpBookStatus"></div>
                 <div class="input-group">
-                    <label for="otpBookGenSize">Buat buku pad baru</label>
+                    <label for="otpBookGenSize" data-i18n="otp.bookLabel">Buat buku pad baru</label>
                     <div class="estimator-row">
                         <select id="otpBookGenSize">
-                            <option value="65536">64 KiB (bisa diekspor grup huruf)</option>
-                            <option value="1048576" selected>1 MiB (standar lapangan)</option>
-                            <option value="4194304">4 MiB</option>
-                            <option value="8388608">8 MiB</option>
+                            <option value="65536" data-i18n="otp.bookOpt64">64 KiB (bisa diekspor grup huruf)</option>
+                            <option value="1048576" selected data-i18n="otp.bookOpt1M">1 MiB (standar lapangan)</option>
+                            <option value="4194304" data-i18n="otp.bookOpt4M">4 MiB</option>
+                            <option value="8388608" data-i18n="otp.bookOpt8M">8 MiB</option>
                         </select>
-                        <button id="otpBookGenBtn" type="button" class="small-button">Buat &amp; unduh .qpad</button>
+                        <button id="otpBookGenBtn" type="button" class="small-button" data-i18n="otp.bookBtn">Buat &amp; unduh .qpad</button>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label for="otpBookFile">Muat buku pad dari file</label>
+                    <label for="otpBookFile" data-i18n="otp.fileLabel">Muat buku pad dari file</label>
                     <input id="otpBookFile" type="file" accept=".qpad,application/octet-stream">
                 </div>
                 <div class="input-group">
-                    <label for="otpBookLoadText">Muat dari teks (base64 / grup huruf)</label>
-                    <textarea id="otpBookLoadText" rows="3" placeholder="Tempel base64 atau grup huruf buku pad kecil..."></textarea>
+                    <label for="otpBookLoadText" data-i18n="otp.textLabel">Muat dari teks (base64 / grup huruf)</label>
+                    <textarea id="otpBookLoadText" rows="3" placeholder="Tempel base64 atau grup huruf buku pad kecil..." data-i18n-ph="otp.textPh"></textarea>
                     <div class="button-row">
-                        <button id="otpBookLoadBtn" type="button" class="small-button">Muat dari teks</button>
-                        <button id="otpBookLettersBtn" type="button" class="small-button">Ekspor grup huruf (buku ≤ 64 KiB)</button>
-                        <button id="otpDestroyBtn" type="button" class="small-button danger">Musnahkan segmen terpakai</button>
-                        <button id="otpForgetBtn" type="button" class="small-button danger">Lupakan buku</button>
+                        <button id="otpBookLoadBtn" type="button" class="small-button" data-i18n="otp.textBtn">Muat dari teks</button>
+                        <button id="otpBookLettersBtn" type="button" class="small-button" data-i18n="otp.lettersBtn">Ekspor grup huruf (buku ≤ 64 KiB)</button>
+                        <button id="otpDestroyBtn" type="button" class="small-button danger" data-i18n="otp.destroyBtn">Musnahkan segmen terpakai</button>
+                        <button id="otpForgetBtn" type="button" class="small-button danger" data-i18n="otp.forgetBtn">Lupakan buku</button>
                     </div>
                 </div>
 
-                <h3 class="section-sub">2. Kirim pesan</h3>
+                <h3 class="section-sub" data-i18n="otp.sendTitle">2. Kirim pesan</h3>
                 <div class="input-group">
-                    <label for="otpPlainText">Pesan</label>
-                    <textarea id="otpPlainText" rows="3" placeholder="Tulis pesan — akan memakai segmen baru dari buku pad..."></textarea>
+                    <label for="otpPlainText" data-i18n="otp.sendLabel">Pesan</label>
+                    <textarea id="otpPlainText" rows="3" placeholder="Tulis pesan — akan memakai segmen baru dari buku pad..." data-i18n-ph="otp.sendPh"></textarea>
                 </div>
-                <button id="otpSendBtn" class="action-button">Buat Paket OTP-v2</button>
+                <button id="otpSendBtn" class="action-button" data-i18n="otp.sendBtn">Buat Paket OTP-v2</button>
                 <div class="input-group block-gap">
-                    <label for="otpPacketOut">Paket (base64)</label>
+                    <label for="otpPacketOut" data-i18n="otp.packetLabel">Paket (base64)</label>
                     <div class="output-group">
                         <textarea id="otpPacketOut" rows="3" readonly></textarea>
-                        <button id="copyOtpPacketBtn" class="copy-button" aria-label="Salin paket OTP">Salin</button>
+                        <button id="copyOtpPacketBtn" class="copy-button" data-i18n-aria="otp.copyAria1" data-i18n="common.copy" aria-label="Salin paket OTP">Salin</button>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label for="otpPacketLetters">Paket (grup huruf untuk radio)</label>
+                    <label for="otpPacketLetters" data-i18n="otp.lettersLabel">Paket (grup huruf untuk radio)</label>
                     <div class="output-group">
                         <textarea id="otpPacketLetters" rows="4" readonly></textarea>
-                        <button id="copyOtpLettersBtn" class="copy-button" aria-label="Salin grup huruf OTP">Salin</button>
+                        <button id="copyOtpLettersBtn" class="copy-button" data-i18n-aria="otp.copyAria2" data-i18n="common.copy" aria-label="Salin grup huruf OTP">Salin</button>
                     </div>
                 </div>
 
-                <h3 class="section-sub">3. Terima pesan</h3>
+                <h3 class="section-sub" data-i18n="otp.recvTitle">3. Terima pesan</h3>
                 <div class="input-group">
-                    <label for="otpPacketIn">Paket masuk (base64 / grup huruf)</label>
-                    <textarea id="otpPacketIn" rows="3" placeholder="Tempel paket OTP-v2..."></textarea>
+                    <label for="otpPacketIn" data-i18n="otp.recvLabel">Paket masuk (base64 / grup huruf)</label>
+                    <textarea id="otpPacketIn" rows="3" placeholder="Tempel paket OTP-v2..." data-i18n-ph="otp.recvPh"></textarea>
                 </div>
-                <button id="otpReceiveBtn" class="action-button">Verifikasi &amp; Dekripsi OTP</button>
+                <button id="otpReceiveBtn" class="action-button" data-i18n="otp.recvBtn">Verifikasi &amp; Dekripsi OTP</button>
                 <div id="otpWarning" class="otp-warning-box" aria-live="polite"></div>
                 <div class="input-group block-gap">
-                    <label for="otpDecryptedOut">Hasil</label>
+                    <label for="otpDecryptedOut" data-i18n="otp.outLabel">Hasil</label>
                     <div class="output-group">
                         <textarea id="otpDecryptedOut" rows="3" readonly></textarea>
-                        <button id="copyOtpDecryptedBtn" class="copy-button" aria-label="Salin hasil OTP">Salin</button>
+                        <button id="copyOtpDecryptedBtn" class="copy-button" data-i18n-aria="otp.copyAria3" data-i18n="common.copy" aria-label="Salin hasil OTP">Salin</button>
                     </div>
                 </div>
             </div>
 
             <div id="contacts-view" class="content-section" role="tabpanel" tabindex="-1">
-                <h2>Buku Kontak &amp; Verifikasi</h2>
-                <p class="description">Simpan Kunci Publik lawan bicara sekali, lalu pilih dari dropdown di tab Enkripsi/Dekripsi — tidak perlu tempel-menempel berulang (rawan salah tempel = celah MITM praktis). Kontak baru selalu berstatus <strong>belum diverifikasi</strong>; tandai terverifikasi hanya setelah fingerprint-nya Anda cocokkan lewat jalur terpisah (tatap muka/QR/telepon).</p>
+                <h2 data-i18n="con.title">Buku Kontak &amp; Verifikasi</h2>
+                <p class="description" data-i18n="con.desc">Simpan Kunci Publik lawan bicara sekali, lalu pilih dari dropdown di tab Enkripsi/Dekripsi — tidak perlu tempel-menempel berulang (rawan salah tempel = celah MITM praktis). Kontak baru selalu berstatus <strong>belum diverifikasi</strong>; tandai terverifikasi hanya setelah fingerprint-nya Anda cocokkan lewat jalur terpisah (tatap muka/QR/telepon).</p>
                 <div id="contactList"></div>
-                <h3 class="section-sub">Tambah kontak</h3>
+                <h3 class="section-sub" data-i18n="con.addTitle">Tambah kontak</h3>
                 <div class="input-group">
-                    <label for="contactName">Nama</label>
-                    <input id="contactName" type="text" autocomplete="off" placeholder="Mis. Stasiun Alfa">
+                    <label for="contactName" data-i18n="con.nameLabel">Nama</label>
+                    <input id="contactName" type="text" autocomplete="off" placeholder="Mis. Stasiun Alfa" data-i18n-ph="con.namePh">
                 </div>
                 <div class="input-group">
-                    <label for="contactKeyJson">Kunci Publik Hibrida (JSON)</label>
-                    <textarea id="contactKeyJson" rows="5" placeholder="Tempel Kunci Publik kontak..."></textarea>
+                    <label for="contactKeyJson" data-i18n="con.keyLabel">Kunci Publik Hibrida (JSON)</label>
+                    <textarea id="contactKeyJson" rows="5" placeholder="Tempel Kunci Publik kontak..." data-i18n-ph="con.keyPh"></textarea>
                 </div>
-                <button id="contactAddBtn" class="action-button">Tambah ke Buku Kontak</button>
+                <button id="contactAddBtn" class="action-button" data-i18n="con.btn">Tambah ke Buku Kontak</button>
             </div>
 
             <div id="about-view" class="content-section" role="tabpanel" tabindex="-1">
-                <h2>Tentang Protokol Q-EKH</h2>
-                <p class="about-intro">"Saya Adalah Mr. J0121312, website ini kredit dari saya."</p>
+                <h2 data-i18n="about.title">Tentang Protokol Q-EKH</h2>
+                <p class="about-intro" data-i18n="about.cred">"Saya Adalah Mr. J0121312, website ini kredit dari saya."</p>
 
-                <p><strong>Q-EKH</strong> adalah protokol enkripsi hibrida pasca-kuantum yang TERAUTENTIKASI. Ada dua lapisan yang bekerja terpisah: lapisan <strong>kerahasiaan</strong> (X25519 + ML-KEM-768) dan lapisan <strong>keaslian pengirim</strong> (Ed25519 + SLH-DSA-192s, tanda tangan ganda).</p>
+                <p data-i18n="about.intro"><strong>Q-EKH</strong> adalah protokol enkripsi hibrida pasca-kuantum yang TERAUTENTIKASI. Ada dua lapisan yang bekerja terpisah: lapisan <strong>kerahasiaan</strong> (X25519 + ML-KEM-768) dan lapisan <strong>keaslian pengirim</strong> (Ed25519 + SLH-DSA-192s, tanda tangan ganda).</p>
 
-                <h3>Mengapa Ini Pilihan yang Bagus?</h3>
+                <h3 data-i18n="about.why">Mengapa Ini Pilihan yang Bagus?</h3>
                 <ul>
-                    <li><strong>Kerahasiaan Berlapis:</strong> X25519 (ECC klasik) dan ML-KEM-768 (pasca-kuantum) digabung lewat HKDF dengan urutan rahasia-PQ-lebih-dulu — mengikuti prinsip yang sama dipakai konstruksi hybrid standar seperti TLS 1.3 dan X-Wing — aman selama salah satu dari keduanya belum bisa dipecahkan.</li>
-                    <li><strong>Keaslian Berlapis:</strong> Setiap pesan ditandatangani DUA kali — Ed25519 (klasik, cepat, teruji puluhan tahun) dan SLH-DSA-192s (berbasis fungsi hash, bukan matematika kisi seperti ML-KEM). Keduanya harus valid. Fondasinya sengaja beda dari lapisan enkripsi, supaya kalau suatu saat ada celah di kriptografi lattice, tanda tangan Anda tidak ikut runtuh.</li>
-                    <li><strong>Kesiapan Masa Depan:</strong> ML-KEM-768 dan SLH-DSA-192s dirancang tahan komputer kuantum, berdasarkan pengetahuan kriptografi saat ini.</li>
+                    <li data-i18n="about.why1"><strong>Kerahasiaan Berlapis:</strong> X25519 (ECC klasik) dan ML-KEM-768 (pasca-kuantum) digabung lewat HKDF dengan urutan rahasia-PQ-lebih-dulu — mengikuti prinsip yang sama dipakai konstruksi hybrid standar seperti TLS 1.3 dan X-Wing — aman selama salah satu dari keduanya belum bisa dipecahkan.</li>
+                    <li data-i18n="about.why2"><strong>Keaslian Berlapis:</strong> Setiap pesan ditandatangani DUA kali — Ed25519 (klasik, cepat, teruji puluhan tahun) dan SLH-DSA-192s (berbasis fungsi hash, bukan matematika kisi seperti ML-KEM). Keduanya harus valid. Fondasinya sengaja beda dari lapisan enkripsi, supaya kalau suatu saat ada celah di kriptografi lattice, tanda tangan Anda tidak ikut runtuh.</li>
+                    <li data-i18n="about.why3"><strong>Kesiapan Masa Depan:</strong> ML-KEM-768 dan SLH-DSA-192s dirancang tahan komputer kuantum, berdasarkan pengetahuan kriptografi saat ini.</li>
                 </ul>
-                <blockquote>Analoginya seperti mengunci brankas dengan dua gembok berbeda jenis, lalu menyegelnya dengan dua meterai berbeda jenis juga. Penyerang harus membobol satu gembok DAN memalsukan satu meterai — dan dua meterai itu sengaja dibuat dari bahan yang beda total.</blockquote>
+                <blockquote data-i18n="about.quote">Analoginya seperti mengunci brankas dengan dua gembok berbeda jenis, lalu menyegelnya dengan dua meterai berbeda jenis juga. Penyerang harus membobol satu gembok DAN memalsukan satu meterai — dan dua meterai itu sengaja dibuat dari bahan yang beda total.</blockquote>
 
                 <div class="important-notice">
-                    <h3>⚠️ Tanda Tangan Hanya Berarti Kalau Kunci Publiknya Sudah Anda Verifikasi</h3>
-                    <p>Tanda tangan digital membuktikan "pesan ini cocok dengan kunci privat pemegang kunci publik X" — tapi TIDAK membuktikan kunci publik X itu benar milik orang yang Anda maksud, kecuali Anda sendiri yang sudah memverifikasinya. Alur yang benar selalu: <strong>verifikasi Fingerprint lewat jalur terpisah dulu</strong> (tab 6 Kontak mendukung QR tatap muka), baru simpan Kunci Publik itu sebagai yang dipercaya, baru pakai untuk verifikasi tanda tangan pesan-pesan berikutnya.</p>
+                    <h3 data-i18n="about.signTitle">⚠️ Tanda Tangan Hanya Berarti Kalau Kunci Publiknya Sudah Anda Verifikasi</h3>
+                    <p data-i18n="about.signText">Tanda tangan digital membuktikan "pesan ini cocok dengan kunci privat pemegang kunci publik X" — tapi TIDAK membuktikan kunci publik X itu benar milik orang yang Anda maksud, kecuali Anda sendiri yang sudah memverifikasinya. Alur yang benar selalu: <strong>verifikasi Fingerprint lewat jalur terpisah dulu</strong> (tab 6 Kontak mendukung QR tatap muka), baru simpan Kunci Publik itu sebagai yang dipercaya, baru pakai untuk verifikasi tanda tangan pesan-pesan berikutnya.</p>
                 </div>
 
-                <h3>Pengerasan Sisi Pasokan (yang baru)</h3>
+                <h3 data-i18n="about.supplyTitle">Pengerasan Sisi Pasokan (yang baru)</h3>
                 <ul>
-                    <li><strong>Tanpa CDN:</strong> semua pustaka kripto disimpan lokal di folder <code>vendor/</code> dan hash SHA-256-nya tercatat di <code>vendor/HASHES.txt</code> untuk diaudit ulang. Halaman berjalan 100% offline.</li>
-                    <li><strong>Self-test saat startup:</strong> HKDF (RFC 5869), AES-256-GCM (vektor NIST), Argon2id (RFC 9106), ML-KEM-768, SLH-DSA, X25519, dan Ed25519 diuji dulu; bila ada yang gagal, semua tombol aksi terkunci otomatis.</li>
-                    <li><strong>CSP ketat:</strong> skrip &amp; gaya hanya dari origin sendiri; tidak ada koneksi jaringan keluar dari halaman.</li>
+                    <li data-i18n="about.supply1"><strong>Tanpa CDN:</strong> semua pustaka kripto disimpan lokal di folder <code>vendor/</code> dan hash SHA-256-nya tercatat di <code>vendor/HASHES.txt</code> untuk diaudit ulang. Halaman berjalan 100% offline.</li>
+                    <li data-i18n="about.supply2"><strong>Self-test saat startup:</strong> HKDF (RFC 5869), AES-256-GCM (vektor NIST), Argon2id (RFC 9106), ML-KEM-768, SLH-DSA, X25519, dan Ed25519 diuji dulu; bila ada yang gagal, semua tombol aksi terkunci otomatis.</li>
+                    <li data-i18n="about.supply3"><strong>CSP ketat:</strong> skrip &amp; gaya hanya dari origin sendiri; tidak ada koneksi jaringan keluar dari halaman.</li>
                 </ul>
 
-                <h3>Fitur Lapangan</h3>
+                <h3 data-i18n="about.fieldTitle">Fitur Lapangan</h3>
                 <ul>
-                    <li><strong>Tombol 🚨 Panik + auto-lock idle:</strong> satu tombol di header (atau timer idle yang bisa diatur di footer) memusnahkan kontak &amp; registry buku pad dari penyimpanan lokal, mengosongkan semua kolom di layar, lalu memuat ulang halaman.</li>
-                    <li><strong>Sidik visual (randomart):</strong> di samping setiap fingerprint hex tampil gambar identicon 9×9 yang diturunkan dari hash yang sama — mencocokkan gambar jauh lebih cepat dan tahan-salah daripada membandingkan 64 karakter hex saat verifikasi tatap muka.</li>
-                    <li><strong>Radiogram → CW:</strong> tab Radiogram bisa memainkan grup huruf sebagai nada morse 600 Hz (timing PARIS, WPM bisa diatur) langsung dari browser, atau mengunduhnya sebagai file .wav untuk diputar ke pemancar.</li>
-                    <li><strong>Lembar cetak salin-tangan:</strong> tombol "Cetak lembar" di tab Radiogram menghasilkan lembar A5 berisi kotak per grup berhuruf mono besar, nomor urut, dan kotak ceklis — meminimalkan salah salin saat menyalin dengan tangan.</li>
-                    <li><strong>Enkripsi FILE (.qekhf):</strong> tab Enkripsi/Dekripsi kini menerima file (seret &amp; letakkan). Isi dipotong per 64 KiB dan tiap potongan diautentikasi AES-256-GCM (konstruksi STREAM); kunci file acak disegel sebagai pesan v5 — satu potongan rusak berarti file ditolak utuh.</li>
-                    <li><strong>Bucket ukuran konstan:</strong> opsi padding di tab Enkripsi yang membuat semua ciphertext persis kelipatan 32–256 KB, melawan analisis ukuran yang lebih teliti daripada blok acak 512 B.</li>
-                    <li><strong>Spesifikasi formal:</strong> seluruh format (envelope v5, OTP-v2, .qpad, .qekhf, fingerprint) didokumentasikan byte-per-byte di <code>docs/SPEC.md</code> beserta test vector deterministik <code>docs/test-vectors.json</code> — memungkinkan audit dan implementasi ulang.</li>
+                    <li data-i18n="about.field1"><strong>Tombol 🚨 Panik + auto-lock idle:</strong> satu tombol di header (atau timer idle yang bisa diatur di footer) memusnahkan kontak &amp; registry buku pad dari penyimpanan lokal, mengosongkan semua kolom di layar, lalu memuat ulang halaman.</li>
+                    <li data-i18n="about.field2"><strong>Sidik visual (randomart):</strong> di samping setiap fingerprint hex tampil gambar identicon 9×9 yang diturunkan dari hash yang sama — mencocokkan gambar jauh lebih cepat dan tahan-salah daripada membandingkan 64 karakter hex saat verifikasi tatap muka.</li>
+                    <li data-i18n="about.field3"><strong>Radiogram → CW:</strong> tab Radiogram bisa memainkan grup huruf sebagai nada morse 600 Hz (timing PARIS, WPM bisa diatur) langsung dari browser, atau mengunduhnya sebagai file .wav untuk diputar ke pemancar.</li>
+                    <li data-i18n="about.field4"><strong>Lembar cetak salin-tangan:</strong> tombol "Cetak lembar" di tab Radiogram menghasilkan lembar A5 berisi kotak per grup berhuruf mono besar, nomor urut, dan kotak ceklis — meminimalkan salah salin saat menyalin dengan tangan.</li>
+                    <li data-i18n="about.field5"><strong>Enkripsi FILE (.qekhf):</strong> tab Enkripsi/Dekripsi kini menerima file (seret &amp; letakkan). Isi dipotong per 64 KiB dan tiap potongan diautentikasi AES-256-GCM (konstruksi STREAM); kunci file acak disegel sebagai pesan v5 — satu potongan rusak berarti file ditolak utuh.</li>
+                    <li data-i18n="about.field6"><strong>Output biner mentah (.qekhb):</strong> tombol "Unduh .qekhb" di tab Enkripsi menghasilkan ciphertext v5 sebagai biner mentah tanpa base64/JSON — ~25% lebih kecil, untuk toolchain radio milik sendiri. Tab Dekripsi bisa membukanya lagi (tombol "Buka file .qekhb"); konversinya bijektif, tidak mengubah satu bit pun kriptografi (SPEC §8).</li>
+                    <li data-i18n="about.field7"><strong>Bucket ukuran konstan:</strong> opsi padding di tab Enkripsi yang membuat semua ciphertext persis kelipatan 32–256 KB, melawan analisis ukuran yang lebih teliti daripada blok acak 512 B.</li>
+                    <li data-i18n="about.field8"><strong>Spesifikasi formal:</strong> seluruh format (envelope v5, OTP-v2, .qpad, .qekhf, fingerprint) didokumentasikan byte-per-byte di <code>docs/SPEC.md</code> beserta test vector deterministik <code>docs/test-vectors.json</code> — memungkinkan audit dan implementasi ulang.</li>
                 </ul>
 
-                <h3>Konsep Kunci Hibrida</h3>
+                <h3 data-i18n="about.hybridTitle">Konsep Kunci Hibrida</h3>
                 <ul>
-                    <li><strong>Kunci Publik (Public Key):</strong> Gembok digital sekaligus meterai verifikasi — boleh dibagikan bebas.</li>
-                    <li><strong>Kunci Privat (Private Key):</strong> Dipakai untuk membuka gembok (dekripsi) DAN membubuhkan meterai (tanda tangan). <span class="warning">TIDAK BOLEH DIBAGIKAN.</span></li>
+                    <li data-i18n="about.hybrid1"><strong>Kunci Publik (Public Key):</strong> Gembok digital sekaligus meterai verifikasi — boleh dibagikan bebas.</li>
+                    <li data-i18n="about.hybrid2"><strong>Kunci Privat (Private Key):</strong> Dipakai untuk membuka gembok (dekripsi) DAN membubuhkan meterai (tanda tangan). <span class="warning">TIDAK BOLEH DIBAGIKAN.</span></li>
                 </ul>
-                <p>Singkatnya: <strong>Bagikan gemboknya (Publik), simpan kuncinya (Privat).</strong></p>
+                <p data-i18n="about.hybridShort">Singkatnya: <strong>Bagikan gemboknya (Publik), simpan kuncinya (Privat).</strong></p>
 
-                <h3>Instruksi Penggunaan</h3>
+                <h3 data-i18n="about.usageTitle">Instruksi Penggunaan</h3>
                 <ol>
-                    <li><strong>Membuat Kunci:</strong> Di tab 1, klik "Buat Pasangan Kunci". Bagikan Kunci Publik dan Fingerprint lewat jalur terpisah, simpan Kunci Privat baik-baik.</li>
-                    <li><strong>Mengenkripsi:</strong> Di tab 2, pilih kontak penerima (atau tempel Kunci Publik-nya, cocokkan fingerprint-nya) DAN Kunci Privat Anda sendiri, tulis pesan, klik "Enkripsi &amp; Tandatangani".</li>
-                    <li><strong>Mendekripsi:</strong> Di tab 3, tempel Kunci Privat Anda dan ciphertext-nya. Untuk verifikasi, pilih kontak pengirim yang fingerprint-nya sudah Anda cocokkan sebelumnya.</li>
-                    <li><strong>Radio:</strong> Di tab 4, konversi ciphertext ke grup huruf + ukur estimasi durasi pancar. Di tab 5, pakai buku pad untuk OTP terautentikasi satu-arah tanpa kunci publik sama sekali.</li>
+                    <li data-i18n="about.usage1"><strong>Membuat Kunci:</strong> Di tab 1, klik "Buat Pasangan Kunci". Bagikan Kunci Publik dan Fingerprint lewat jalur terpisah, simpan Kunci Privat baik-baik.</li>
+                    <li data-i18n="about.usage2"><strong>Mengenkripsi:</strong> Di tab 2, pilih kontak penerima (atau tempel Kunci Publik-nya, cocokkan fingerprint-nya) DAN Kunci Privat Anda sendiri, tulis pesan, klik "Enkripsi &amp; Tandatangani".</li>
+                    <li data-i18n="about.usage3"><strong>Mendekripsi:</strong> Di tab 3, tempel Kunci Privat Anda dan ciphertext-nya. Untuk verifikasi, pilih kontak pengirim yang fingerprint-nya sudah Anda cocokkan sebelumnya.</li>
+                    <li data-i18n="about.usage4"><strong>Radio:</strong> Di tab 4, konversi ciphertext ke grup huruf + ukur estimasi durasi pancar. Di tab 5, pakai buku pad untuk OTP terautentikasi satu-arah tanpa kunci publik sama sekali.</li>
                 </ol>
 
-                <p class="honesty-note">Catatan jujur: primitif pasca-kuantum di sini (ML-KEM, SLH-DSA) berasal dari pustaka <code>@noble/post-quantum</code> yang baru "self-audited" oleh pembuatnya sendiri, belum lewat audit independen pihak ketiga, dan implementasi JS-nya tidak mengklaim tahan side-channel. Cukup baik untuk proyek pribadi/edukasi seperti ini.</p>
+                <p class="honesty-note" data-i18n="about.honesty">Catatan jujur: primitif pasca-kuantum di sini (ML-KEM, SLH-DSA) berasal dari pustaka <code>@noble/post-quantum</code> yang baru "self-audited" oleh pembuatnya sendiri, belum lewat audit independen pihak ketiga, dan implementasi JS-nya tidak mengklaim tahan side-channel. Cukup baik untuk proyek pribadi/edukasi seperti ini.</p>
             </div>
         </main>
 
         <footer>
-            <p>Web Crypto API (X25519, Ed25519, HKDF, AES-GCM) + pustaka lokal <code>vendor/</code> (@noble/post-quantum, @noble/hashes) — tanpa CDN, bisa offline penuh.</p>
-            <p id="selfTestStatus" class="selftest-status" aria-live="polite">Self-test: belum berjalan</p>
+            <p data-i18n="footer.note">Web Crypto API (X25519, Ed25519, HKDF, AES-GCM) + pustaka lokal <code>vendor/</code> (@noble/post-quantum, @noble/hashes) — tanpa CDN, bisa offline penuh.</p>
+            <p id="selfTestStatus" class="selftest-status" aria-live="polite" data-i18n="footer.selftest.pending">Self-test: belum berjalan</p>
             <p class="autolock-row">
-                <label for="autoLockSelect">Auto-lock saat idle:</label>
+                <label for="autoLockSelect" data-i18n="footer.autolockLabel">Auto-lock saat idle:</label>
                 <select id="autoLockSelect">
-                    <option value="0">mati</option>
-                    <option value="5">5 menit</option>
-                    <option value="10">10 menit</option>
-                    <option value="30">30 menit</option>
+                    <option value="0" data-i18n="footer.autolock0">mati</option>
+                    <option value="5" data-i18n="footer.autolock5">5 menit</option>
+                    <option value="10" data-i18n="footer.autolock10">10 menit</option>
+                    <option value="30" data-i18n="footer.autolock30">30 menit</option>
+                </select>
+                <label for="langSelect" data-i18n="footer.langLabel">Bahasa / Language:</label>
+                <select id="langSelect">
+                    <option value="id">Bahasa Indonesia</option>
+                    <option value="en">English</option>
+                </select>
+                <label for="langSelect" data-i18n="footer.langLabel">Bahasa / Language:</label>
+                <select id="langSelect">
+                    <option value="id">Bahasa Indonesia</option>
+                    <option value="en">English</option>
+                </select>
+                <label for="langSelect" data-i18n="footer.langLabel">Bahasa / Language:</label>
+                <select id="langSelect">
+                    <option value="id">Bahasa Indonesia</option>
+                    <option value="en">English</option>
                 </select>
             </p>
         </footer>

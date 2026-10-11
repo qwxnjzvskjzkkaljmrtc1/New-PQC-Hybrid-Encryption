@@ -6,6 +6,46 @@ dengan nama cache service worker (`sw.js`) dan format protokol.
 
 Butir yang selesai dari `kotak_inbox_saran.txt` dipindahkan ke sini.
 
+## [v6.6] - 2026-10-11
+
+### Ditambahkan
+- **C.3 Output biner mentah `.qekhb` (P1 — butir terakhir P1):**
+  format `QEKHB1` (SPEC §8) — envelope v5 dalam biner mentah **tanpa
+  base64/JSON**: overhead tetap 1.175 byte, hemat ≥25% dibanding
+  bentuk base64. Konversi bijektif (tidak mengubah satu bit pun
+  kriptografi; AAD & verifikasi tanda tangan berjalan persis seperti
+  base64). Hanya pesan v5; v3/v4 tetap base64. Fungsi murni di
+  `crypto.js` (`payloadToBinary`/`binaryToPayload` + validasi ketat:
+  magic, versi, panjang persis, tolak data sisa/terpotong). UI: tombol
+  "⬇ Unduh .qekhb (biner mentah)" di tab Enkripsi + "📂 Buka file
+  .qekhb" di tab Dekripsi (auto-konversi ke base64 lalu dekripsi biasa).
+- **Tes:** 13 tes baru QEKHB1 (round-trip identik byte-per-byte, ukuran,
+  layout known-structure sesuai SPEC, end-to-end dekripsi via biner,
+  penerima salah, magic/terpotong/data sisa/terlalu kecil, v4 ditolak)
+  — total **100 tes, 0 gagal**.
+- **E.6 UI dwibahasa Indonesia/Inggris (P3 — butir roadmap):**
+  saklar bahasa di footer (Bahasa Indonesia / English), preferensi
+  tersimpan di `localStorage['qekh.lang']` (ikut terhapus oleh tombol
+  🚨 Panik). Satu kamus ±335 kunci di `ui.js` + mesin ringan: `t()`
+  dengan interpolasi `{var}`, `applyI18n()` untuk elemen statis via
+  atribut `data-i18n` / `data-i18n-ph` / `data-i18n-aria` /
+  `data-i18n-title` di `index.html`, dan re-render konten dinamis saat
+  ganti bahasa (daftar kontak, dropdown, status buku pad, hitung
+  karakter, estimasi radiogram, status self-test). Tanggal memakai
+  loka `id-ID` / `en-US` sesuai bahasa aktif; `lang` dokumen ikut
+  diperbarui. Pesan error teknis dari modul kripto (`crypto.js`/
+  `otp.js`/`cw.js`) sengaja **tetap bahasa Indonesia** — stabil,
+  konsisten, dan selaras dengan vektor uji.
+
+### Diubah
+- `docs/SPEC.md`: seksi baru §8 (QEKHB1); seksi lama 8/9 digeser jadi
+  9/10.
+- `ui.js` & `index.html`: seluruh teks statis, label, placeholder,
+  toast, dan dialog kini memakai kunci i18n (terjemahan bahasa
+  Indonesia tetap menjadi bahasa bawaan).
+- Cache service worker `qekh-v6-5` → `qekh-v6-6`.
+- Tab "Tentang" mendokumentasikan .qekhb.
+
 ## [v6.5] - 2026-10-11
 
 ### Ditambahkan
