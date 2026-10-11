@@ -4,7 +4,7 @@ Enkripsi & autentikasi **hibrida pasca-kuantum** untuk komunikasi terselubung le
 
 > **Posisi jujur:** aplikasi ini dirancang untuk ancaman setingkat *state actor* (lihat [`hiding-transmitter-location.txt`](hiding-transmitter-location.txt)), tapi **belum diaudit pihak ketiga** dan tanpa *forward secrecy*. Baca [`SECURITY.md`](SECURITY.md) sebelum mempercayainya dengan sesuatu yang penting.
 
-![CI](https://github.com/qwxnjzvskjzkkaljmrtc1/New-PQC-Level-5/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/qwxnjzvskjzkkaljmrtc1/New-PQC-Hybrid-Encryption/actions/workflows/ci.yml/badge.svg)
 
 ## Mengapa hibrida, dan konstruksi apa yang dipakai
 
