@@ -1,0 +1,38 @@
+# CI Q-EKH Protocol (butir F.2) — tes otomatis setiap push/PR.
+# Node 22+ diperlukan: WebCrypto Ed25519 (dipakai crypto.js, tes, dan
+# tools/sign-release.mjs) baru tersedia di Node >= 22.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Tes otomatis (round-trip v3/v4/v5, tamper, test vector, file chunked, OTP, CW, FHSS)
+        run: node tests/qekh.test.mjs
+
+      - name: Verifikasi integritas vendor/ (SHA-256 sesuai HASHES.txt)
+        run: bash tools/vendor-update.sh check
+
+      - name: Verifikasi tanda tangan rilis (E.3)
+        # Rilis WAJIB ditandatangani setelah setiap vendor-update / perubahan
+        # HASHES.txt. Bila .qekhsig ada, verifikasi HARUS lulus; bila belum
+        # ada, CI memperingatkan (ritual: tools/sign-release.mjs init|sign).
+        run: |
+          if [ -f vendor/HASHES.txt.qekhsig ]; then
+            node tools/verify-release.mjs
+          else
+            echo "::warning::vendor/HASHES.txt.qekhsig tidak ditemukan — rilis belum ditandatangani. Jalankan tools/sign-release.mjs sign."
+          fi

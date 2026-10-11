@@ -6,6 +6,36 @@ dengan nama cache service worker (`sw.js`) dan format protokol.
 
 Butir yang selesai dari `kotak_inbox_saran.txt` dipindahkan ke sini.
 
+## [v6.5] - 2026-10-11
+
+### Ditambahkan
+- **README.md lengkap (sebelumnya hanya satu baris judul):**
+  posisi & konstruksi protokol (tabel lapisan), fitur per tab,
+  mulai cepat (`serve.py` / server statis / install PWA), urutan
+  verifikasi sebelum mempercayai (hash vendor → tanda tangan rilis →
+  self-test → vektor uji), struktur proyek, ritual maintainer, dan
+  rujukan ke SECURITY.md / SPEC.md / CHANGELOG.
+- **E.3 (penyelesaian) — kunci publik rilis & tanda tangan pertama:**
+  `docs/release-pubkey.json` kini benar-benar diterbitkan (Ed25519 +
+  SLH-DSA-192s, fingerprint
+  `1BE7 9EEA 913A DB3C 16E7 29DB 9293 01C8 A8F1 F84F 364C 7A78 7A98 0CFC FF46 E0E2`),
+  dan `vendor/HASHES.txt` ditandatangani pertama kali →
+  `vendor/HASHES.txt.qekhsig` (terverifikasi `tools/verify-release.mjs`).
+  Kunci privat tetap lokal di `tools/release-key.json` (mode 600,
+  gitignored — tidak ikut commit).
+- **F.2 (penyelesaian) — CI GitHub Actions:** `.github/workflows/ci.yml`
+  di setiap push/PR menjalankan (1) seluruh tes Node `tests/qekh.test.mjs`,
+  (2) `tools/vendor-update.sh check` (SHA-256 seluruh file vendor), dan
+  (3) `tools/verify-release.mjs` — gagal bila tanda tangan ada tapi
+  tidak valid, peringatan bila belum ada. Node 22+ (WebCrypto Ed25519).
+- **F.3 (penyelesaian) — `.gitignore` (sebelumnya tidak ada):** kini
+  benar-benar meng-ignore `tools/release-key.json` (kunci privat rilis),
+  `kimi-debug-session_*.zip`, file transien alat, dan noise OS/editor.
+
+### Diubah
+- Cache service worker `qekh-v6-4` → `qekh-v6-5` (konvensi: nomor versi
+  selaras nama cache; tidak ada perubahan logika aplikasi).
+
 ## [v6.4] - 2026-10-09
 
 ### Diperbaiki
