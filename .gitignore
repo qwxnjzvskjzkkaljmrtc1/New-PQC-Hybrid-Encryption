@@ -1,0 +1,28 @@
+# ============================================================
+# Q-EKH Protocol — .gitignore
+# ============================================================
+
+# Kunci PRIVAT rilis Q-EKH (butir E.3) — JANGAN PERNAH di-commit.
+# File ini dibuat oleh `node tools/sign-release.mjs init` (mode 600).
+# Yang boleh di-commit hanya pasangannya: docs/release-pubkey.json.
+tools/release-key.json
+
+# Sesi debug (butir F.3) — tidak perlu ikut di repo.
+kimi-debug-session_*.zip
+
+# Transien alat bantu
+vendor/HASHES.txt.tmp
+vendor/tmp/
+tools/tmp/
+
+# OS / editor / runtime
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.vscode/
+.idea/
