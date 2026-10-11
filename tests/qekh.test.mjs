@@ -22,6 +22,8 @@ import {
     arrayBufferToBase64, base64ToUint8Array, encodeText, decodeText,
     fingerprintArt, constantTimeEqual, encryptFileHybrid, decryptFileHybrid,
     fhssSchedule,
+    payloadToBinary, binaryToPayload, envelopeObjectToBinary, binaryToEnvelopeObject,
+    BINARY_FIXED, BINARY_MIN_SIZE,
 } from '../crypto.js';
 import {
     generatePadBook, serializePadBook, parsePadBook, otpSend, otpReceive,
@@ -187,6 +189,50 @@ async function main() {
     await throws('file terpotong -> ditolak', () => decryptFileHybrid(bob.privateKeyJson, truncFile, alice.publicKeyJson), 'terpotong');
     await throws('penerima salah -> segel kunci gagal dibuka', () => decryptFileHybrid(alice.privateKeyJson, fenc.container, alice.publicKeyJson));
     await throws('magic salah -> ditolak', () => decryptFileHybrid(bob.privateKeyJson, encodeText('XXXXXX' + '0'.repeat(100)), ''), 'Magic');
+
+    console.log('== Envelope biner mentah .qekhb (C.3) ==');
+    const binPayload = await encryptHybrid(bob.publicKeyJson, alice.privateKeyJson, 'Uji format biner mentah');
+    const bin = payloadToBinary(binPayload);
+    ok('round-trip biner->base64 identik byte-per-byte', binaryToPayload(bin) === binPayload);
+    const binEnv = JSON.parse(decodeText(base64ToUint8Array(binPayload)));
+    const binCtLen = base64ToUint8Array(binEnv.ciphertext).length;
+    ok('ukuran = 1175 + N (N = panjang ciphertext)', bin.length === BINARY_FIXED + binCtLen);
+    // 4/3 adalah ekspansi base64 maksimum: biner harus selalu < 75% ukuran
+    // base64 (hemat ≥25%), termasuk untuk pesan kecil (ratio ~0.68).
+    ok('biner < 75% ukuran base64 (hemat ~25%)', bin.length < binPayload.length && bin.length * 4 < binPayload.length * 3);
+
+    // LayoutKnownAnswer: susun byte diharapkan MANUAL (tanpa fungsi impl.)
+    // sesuai SPEC §8.1 — memastikan offset & urutan field tepat.
+    const fx = base64ToUint8Array(binEnv.ephemeralX25519);
+    const fk = base64ToUint8Array(binEnv.kyberCiphertext);
+    const fs = base64ToUint8Array(binEnv.salt);
+    const fv = base64ToUint8Array(binEnv.iv);
+    const fc = base64ToUint8Array(binEnv.ciphertext);
+    const u32be = (n) => new Uint8Array([n >>> 24, n >>> 16, n >>> 8, n & 0xff]);
+    const expected = new Uint8Array(6 + 1 + 4 + fx.length + fk.length + fs.length + fv.length + fc.length);
+    let eo = 0;
+    expected.set(encodeText('QEKHB1'), eo); eo += 6;
+    expected[eo++] = 1;
+    expected.set(u32be(fc.length), eo); eo += 4;
+    for (const part of [fx, fk, fs, fv, fc]) { expected.set(part, eo); eo += part.length; }
+    ok('layout byte-per-byte sesuai SPEC §8.1 (known-structure)', bytesToHex(bin) === bytesToHex(expected));
+
+    // End-to-end: biner dibuka lewat jalur dekripsi biasa
+    const binDec = await decryptHybrid(bob.privateKeyJson, binaryToPayload(bin), alice.publicKeyJson);
+    ok('dekripsi via biner: plaintext + tanda tangan verified', binDec.plaintext === 'Uji format biner mentah' && binDec.verification.status === 'verified');
+    const wrongBin = await decryptHybrid(alice.privateKeyJson, binaryToPayload(bin), bob.publicKeyJson).catch(() => null);
+    ok('penerima salah via biner -> ditolak/digagal', !wrongBin || wrongBin.verification.status !== 'verified');
+
+    await throws('magic .qekhb salah -> ditolak', () => binaryToPayload(encodeText('XXXXXX' + '0'.repeat(1400))), 'Magic');
+    await throws('.qekhb terpotong -> ditolak', () => binaryToPayload(bin.slice(0, bin.length - 20)), 'terpotong');
+    const withTail = new Uint8Array(bin.length + 3);
+    withTail.set(bin, 0); withTail.set([1, 2, 3], bin.length);
+    await throws('ada data di luar envelope -> ditolak', () => binaryToPayload(withTail), 'tidak utuh');
+    await throws('file terlalu kecil -> ditolak', () => binaryToPayload(new Uint8Array(50)), 'terlalu kecil');
+    ok('konstanta ukuran konsisten', BINARY_FIXED === 1175 && BINARY_MIN_SIZE === BINARY_FIXED + 16);
+    const legacyLike = { version: 'QEKH-v4', ephemeralX25519: arrayBufferToBase64(getSampleBytes(32)), kyberCiphertext: arrayBufferToBase64(getSampleBytes(1088)), salt: arrayBufferToBase64(getSampleBytes(32)), iv: arrayBufferToBase64(getSampleBytes(12)), ciphertext: arrayBufferToBase64(getSampleBytes(100)) };
+    await throws('envelope v4 -> format biner ditolak', () => envelopeObjectToBinary(legacyLike), 'hanya untuk pesan v5');
+    await throws('payload bukan base64 JSON -> ditolak', () => payloadToBinary('!!!bukan-base64!!!'), 'base64');
 
     console.log('== Buku pad .qpad ==');
     const book = generatePadBook(4096);

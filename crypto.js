@@ -854,6 +854,100 @@ export async function decryptHybrid(recipientPrivateJsonText, payloadBase64Text,
     return { plaintext: pkg.body, verification, meta };
 }
 
+// ===================================================================
+//            ENVELOPE BINER MENTAH — QEKHB1 (.qekhb)  (C.3)
+// ===================================================================
+// Output biner mentah TANPA base64/JSON untuk toolchain radio: ~25%
+// lebih kecil daripada bentuk base64 (overhead 1.175 byte tetap).
+// Hanya untuk pesan v5 — v3/v4 tetap memakai envelope JSON base64.
+//
+// Konversi bolak-balik dengan envelope JSON v5 (§SPEC 3) BIJEKTIF:
+// tidak satu bit pun kriptografi yang berubah; semua validasi
+// (dekripsi, tanda tangan, AAD) berjalan persis seperti pada base64.
+//
+// Layout (seluruh integer BIG-ENDIAN):
+//   offset 0     : magic "QEKHB1" (6 B)
+//   offset 6     : versi format biner, u8 (kini 1)
+//   offset 7     : N, u32 — panjang field ciphertext (byte)
+//   offset 11    : ephemeralX25519 (32 B)
+//   offset 43    : kyberCiphertext (1088 B)
+//   offset 1131  : salt (32 B)
+//   offset 1163  : iv (12 B)
+//   offset 1175  : ciphertext (N B)  -> total = 1175 + N
+
+const BINARY_MAGIC = encodeText('QEKHB1');
+const BINARY_VERSION = 1;
+// Offsets tetap (lihat SPEC §8.1): head 11 B, lalu x(32) k(1088) s(32) v(12)
+// = 1175 B tetap sebelum ciphertext; total = 1175 + N.
+export const BINARY_FIXED = BINARY_MAGIC.length + 1 + 4
+    + BYTE_LENGTHS.x25519Public + BYTE_LENGTHS.mlkemCiphertext
+    + BYTE_LENGTHS.salt + BYTE_LENGTHS.iv; // 1175
+export const BINARY_MIN_SIZE = BINARY_FIXED + 16; // ct min. AES-GCM = tag 16B
+
+export function envelopeObjectToBinary(envelope) {
+    if (!envelope || typeof envelope !== 'object' || envelope.version !== PROTOCOL_VERSION) {
+        throw new Error('Format biner (.qekhb) hanya untuk pesan v5 (QEKH-v5) — v3/v4 tetap memakai base64.');
+    }
+    const x = base64ToUint8Array(envelope.ephemeralX25519, BYTE_LENGTHS.x25519Public, 'ephemeralX25519');
+    const k = base64ToUint8Array(envelope.kyberCiphertext, BYTE_LENGTHS.mlkemCiphertext, 'kyberCiphertext');
+    const s = base64ToUint8Array(envelope.salt, BYTE_LENGTHS.salt, 'salt');
+    const v = base64ToUint8Array(envelope.iv, BYTE_LENGTHS.iv, 'iv');
+    const c = base64ToUint8Array(envelope.ciphertext, undefined, 'ciphertext');
+    if (c.length === 0) throw new Error('Field ciphertext kosong — bukan envelope v5 yang valid.');
+    const len = new Uint8Array(4);
+    new DataView(len.buffer).setUint32(0, c.length, false); // big-endian
+    return concatBytes(BINARY_MAGIC, new Uint8Array([BINARY_VERSION]), len, x, k, s, v, c);
+}
+
+export function binaryToEnvelopeObject(bytes) {
+    const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    if (b.length < BINARY_MIN_SIZE) {
+        throw new Error('Envelope .qekhb terpotong — terlalu kecil untuk pesan yang valid.');
+    }
+    if (!constantTimeEqual(b.slice(0, BINARY_MAGIC.length), BINARY_MAGIC)) {
+        throw new Error('Magic tidak cocok — bukan envelope .qekhb.');
+    }
+    if (b[BINARY_MAGIC.length] !== BINARY_VERSION) {
+        throw new Error(`Versi format biner tidak dikenal (${b[BINARY_MAGIC.length]}) — dibutuhkan ${BINARY_VERSION}.`);
+    }
+    const n = new DataView(b.buffer, b.byteOffset + BINARY_MAGIC.length + 1, 4).getUint32(0, false);
+    const total = BINARY_FIXED + n;
+    if (total > b.length) throw new Error('Envelope .qekhb terpotong — panjang tidak cocok.');
+    if (total < b.length) throw new Error('Ada data di luar envelope .qekhb — file tidak utuh.');
+    let o = BINARY_MAGIC.length + 1 + 4; // 11 — field pertama
+    const x = b.slice(o, o += BYTE_LENGTHS.x25519Public);
+    const k = b.slice(o, o += BYTE_LENGTHS.mlkemCiphertext);
+    const s = b.slice(o, o += BYTE_LENGTHS.salt);
+    const v = b.slice(o, o += BYTE_LENGTHS.iv);
+    const c = b.slice(o, o + n);
+    // Urutan field harus identik dengan serialisasi encryptHybrid —
+    // sehingga round-trip biner->base64 identik byte-per-byte.
+    return {
+        version: PROTOCOL_VERSION,
+        ephemeralX25519: arrayBufferToBase64(x),
+        kyberCiphertext: arrayBufferToBase64(k),
+        salt: arrayBufferToBase64(s),
+        iv: arrayBufferToBase64(v),
+        ciphertext: arrayBufferToBase64(c),
+    };
+}
+
+// Bentuk praktis: payload base64 (hasil tab Enkripsi) <-> biner mentah.
+export function payloadToBinary(payloadBase64Text) {
+    let env;
+    try {
+        env = JSON.parse(decodeText(base64ToUint8Array(payloadBase64Text, undefined, 'payload')));
+    } catch (e) {
+        if (e.message && e.message.includes('base64')) throw e;
+        throw new Error('Bukan payload Q-EKH base64 yang valid — enkripsi dulu di tab 2.');
+    }
+    return envelopeObjectToBinary(env);
+}
+
+export function binaryToPayload(bytes) {
+    return arrayBufferToBase64(encodeText(JSON.stringify(binaryToEnvelopeObject(bytes))));
+}
+
 // --- Fingerprint dari JSON Kunci Publik (untuk pencocokan anti-MITM) ---
 export async function fingerprintFromPublicJson(publicJsonText) {
     return await fingerprintOfPublicFields(loadPublicKey(publicJsonText));

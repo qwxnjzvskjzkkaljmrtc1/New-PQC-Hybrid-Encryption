@@ -1,4 +1,4 @@
-# SPEC.md — Spesifikasi Protokol Q-EKH (format v5 / OTP-v2 / QEKH-FILE-v1)
+# SPEC.md — Spesifikasi Protokol Q-EKH (format v5 / OTP-v2 / QEKH-FILE-v1 / QEKHB1)
 
 Dokumen ini adalah spesifikasi formal, byte per byte, dari seluruh format
 yang diproduksi/dikonsumsi aplikasi. Tujuannya: audit independen dan
@@ -296,7 +296,7 @@ identik — bila tidak, ada drift pada pustaka vendor atau implementasi).
 Verifikasi otomatis: `node tests/qekh.test.mjs`.
 
 =====================================================================
-9. BATASAN KEAMANAN (jujur)
+10. BATASAN KEAMANAN (jujur)
 =====================================================================
 - Pustaka pasca-kuantum noble belum diaudit independen pihak ketiga;
   implementasi JS tidak mengklaim tahan side-channel.
