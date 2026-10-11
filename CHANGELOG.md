@@ -6,6 +6,19 @@ dengan nama cache service worker (`sw.js`) dan format protokol.
 
 Butir yang selesai dari `kotak_inbox_saran.txt` dipindahkan ke sini.
 
+## [v6.7] - 2026-10-11
+
+### Ditambahkan
+- **Audit brand kit & dokumentasi regenerasi ikon (A.3):** `brand/README.txt`
+  mendokumentasikan logo, palet, clear-space, ukuran minimum, dan penamaan.
+  README kini memetakan aset brand serta menjelaskan bahwa
+  `python3 tools/make_icons.py` (Python standar, tanpa Pillow) membangkitkan
+  ikon PWA 192/512, varian maskable, favicon 16/32, dan `social-preview.png`
+  secara deterministik.
+
+### Diubah
+- Cache service worker `qekh-v6-6` → `qekh-v6-7`.
+
 ## [v6.6] - 2026-10-11
 
 ### Ditambahkan

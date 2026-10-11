@@ -101,7 +101,7 @@ vendor/                        pustaka kripto lokal (noble) + HASHES.txt + HASHE
 docs/                          SPEC.md, test-vectors.json, release-pubkey.json
 tools/                         vendor-update.sh, sign/verify-release.mjs, gen-test-vectors.mjs, make_icons.py
 tests/                         tes otomatis (Node)
-brand/, icons/                 brand kit & ikon (termasuk maskable)
+brand/, icons/, social-preview.png  brand kit & aset turunan; panduan: brand/README.txt
 ```
 
 ## Ritual maintainer
@@ -112,7 +112,7 @@ brand/, icons/                 brand kit & ikon (termasuk maskable)
   node tools/sign-release.mjs sign                    # tandatangani ulang HASHES.txt setelahnya
   ```
 - **Rilis bertanda tangan:** `node tools/sign-release.mjs init` (sekali; kunci privat `tools/release-key.json` dibuat lokal, mode 600, **gitignored — jangan pernah commit**), lalu `sign` di setiap rilis. Kunci publik + `vendor/HASHES.txt.qekhsig` yang di-commit.
-- **Ikon & social preview:** `python3 tools/make_icons.py` (murni Python, deterministik).
+- **Ikon & social preview:** dari root jalankan `python3 tools/make_icons.py` (Python standar, tanpa Pillow); regenerasi deterministik ikon PWA 192/512, varian maskable, favicon 16/32, dan `social-preview.png`.
 - Perubahan dicatat di [`CHANGELOG.md`](CHANGELOG.md); nomor versi selaras dengan nama cache `sw.js`.
 
 ## Keamanan & batasan
