@@ -4,7 +4,7 @@
 // PENTING: respons server yang eksplisit (401 auth, 404) selalu diteruskan
 // apa adanya — cache TIDAK boleh melewati gerbang Basic Auth serve.py
 // (bug lama: cache-first membuat "batal login" tetap bisa masuk).
-const CACHE = 'qekh-v6-5';
+const CACHE = 'qekh-v6-6';
 
 const ASSETS = [
     "./",
