@@ -1,0 +1,129 @@
+=============================================================
+HIDING TRANSMITTER LOCATION — NOTES
+(Companion notes to QEKH v5 encrypted radio project)
+=============================================================
+
+CORE TRUTH
+----------
+Encryption hides WHAT you say, not WHERE you are.
+QEKH v5 protects content perfectly, but radio direction finding
+(RDF) does not need to read your message at all. It works on the
+raw physics of your transmission. You need a second layer of
+defense against a completely different threat model.
+
+
+HOW THEY LOCATE YOU (know your enemy)
+-------------------------------------
+1. AoA triangulation (angle of arrival):
+   Two or more receiving stations measure the bearing your signal
+   arrives from (rotating loops, phased arrays, Doppler antennas).
+   Where the bearing lines cross is you. Accuracy improves with
+   distance between their stations and number of measurements.
+
+2. TDOA (time difference of arrival):
+   Multiple receivers timestamp your signal's arrival; the
+   differences place you on hyperbolas. Works on skywave
+   (ionosphere-bounced) signals. This is how state actors
+   geolocate HF transmitters, at continental scale. This is
+   exactly the "bounces off the ionosphere" scenario.
+
+3. Signal analysis:
+   Even encrypted, your transmission has a fingerprint:
+   modulation type, bandwidth, duration, schedule, and even
+   transmitter-specific hardware imperfections (RF fingerprinting).
+   Regular habits alone ("every night at 9pm") shrink the
+   search area.
+
+
+WHAT ACTUALLY WORKS (roughly in order of effectiveness)
+-------------------------------------------------------
+
+1. TRANSMIT LESS — this is ~80% of the defense.
+   RDF needs signal-on-air time. Every second you transmit is
+   measurement opportunity.
+   - Compress everything, use BURST TRANSMISSION: record offline,
+     transmit the whole thing in the shortest possible burst
+     (sub-second if the link allows), then go dark.
+   - Transmit at RANDOM, IRREGULAR times, never on a schedule.
+   - One transmission, one location — NEVER transmit twice from
+     the same place.
+
+2. SEPARATE THE TRANSMITTER FROM YOU.
+   The big one, purely offline-compatible:
+   - Remote/unattended transmitter: leave a cheap ESP32+radio
+     node at a distant location, trigger it over a short-range
+     hop or timer (dead-man schedule), be nowhere near it when
+     it fires. RDF finds the node, not you. Cost: a $15 device.
+   - Store-and-forward relay: you -> short-range link (BLE/WiFi/
+     LoRa at minimum power, meters of range) -> relay node far
+     away -> HF transmitter. Your detectable emission is tiny and
+     local; the loud emission is somewhere you are not.
+   - Moving transmitter: transmit from a vehicle in motion, or
+     drop it on a passing bus/train route. A location fix of a
+     moving point is stale the moment it is computed.
+
+3. PHYSICS TRICKS (weaker, but additive):
+   - Directional antennas (Yagi, corner reflector): point energy
+     only where it needs to go. Skywave HF is hard to make truly
+     directional for the ionosphere path, but it slashes
+     GROUND-WAVE leakage to nearby receivers.
+   - NVIS (near-vertical incidence skywave): shoot nearly
+     straight up; signal comes down in a ~300-500 km circle with
+     almost no ground wave. Harder for distant ground stations to
+     catch — good if your intended receiver is regional and your
+     adversary is local, bad if they are regional too.
+   - Minimum necessary power: every dB you cut shrinks the radius
+     where you are detectable. Use just enough for your link
+     budget.
+   - Frequency agility (FHSS): hop across many channels on a
+     pseudo-random schedule only your receiver knows (seed it
+     from your shared key — you already have HKDF!). Listeners
+     with a single narrowband receiver miss most of your signal;
+     a wideband adversary still catches it, but you have raised
+     their cost.
+
+4. DON'T BE AT "HOME."
+   The single most common failure: people transmit from their
+   residence. Even perfect burst discipline fails eventually if
+   every fix points at the same house. Rotate locations, and make
+   none of them traceable to your identity.
+
+
+WHAT DOES NOT WORK
+------------------
+- Encryption as location protection — irrelevant to RDF.
+- Hiding in noise / LPI (DSSS spread spectrum below the noise
+  floor): real militaries use this, but on HF it is extremely
+  hard with hobbyist hardware, and a wideband recording adversary
+  can still integrate and find you. Do not rely on it.
+- Decoys (fake transmitters elsewhere): costs an adversary time
+  but does not survive pattern analysis if your real habits leak.
+
+
+THE REALISTIC, HONEST CEILING
+-----------------------------
+Against a CASUAL/LOCAL adversary (someone with an SDR and a
+directional antenna):
+  bursts + min power + random schedule + directional antenna
+  make you very hard to find.
+
+Against a STATE-LEVEL adversary with a TDOA receiver network:
+  if you transmit skywave HF regularly, they WILL eventually
+  geolocate the transmitter. Full stop. Your only real defenses
+  are the architectural ones: REMOTE, DISPOSABLE, MOBILE,
+  ONE-TIME transmitters — so the location they find is a $15 box,
+  not you. Physics does not negotiate; you route around it by
+  making the found location worthless.
+
+
+THE PATTERN TO REMEMBER
+-----------------------
+The strongest protections are ARCHITECTURAL and BEHAVIORAL
+(remote nodes, bursts, rotation), not cryptographic.
+Math and physics help at the margins (FHSS schedules from HKDF
+keys, directional gain, NVIS geometry, link-budget-driven power
+minimization), but the winning move is:
+
+  When the signal IS caught — and it will be — its origin
+  tells them nothing about you.
+=============================================================

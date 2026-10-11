@@ -1,0 +1,282 @@
+=============================================================
+REKOMENDASI PENGEMBANGAN — Q-EKH PROTOCOL v5
+Tanggal: 2026-10-09
+Dasar analisis: script.js, index.html, style.css, serve.py,
+                hiding-transmitter-location.txt
+=============================================================
+
+JAWABAN SINGKAT ATAS PERTANYAAN ANDA
+------------------------------------
+1. Inti enkripsi (X25519 + ML-KEM-768, AES-256-GCM, Ed25519 +
+   SLH-DSA, sealed sender, Argon2id) SUDAH KUAT. Jangan dirancang
+   ulang — merombak inti yang sudah benar justru berisiko
+   menambah bug. Yang dibutuhkan bukan "enkripsi baru", melainkan
+   pengerasan di sekitarnya.
+2. Kelemahan NYATA nomor satu bukan di algoritma, melainkan di
+   RANTAI PASOK: script.js memuat ketiga pustaka kripto dari CDN
+   esm.sh SETIAP kali halaman dibuka. Untuk proyek dengan threat
+   model setingkat "state actor" (lihat catatan lokasi pemancar
+   Anda sendiri), ini titik paling lemah di seluruh sistem.
+   Perbaikan ini = prioritas tertinggi.
+3. Soal "sistem OTP yang sangat kuat dan baru dibuat dari awal":
+   fakta jujurnya — OTP yang ada sekarang (XOR + CSPRNG) SUDAH
+   aman sempurna secara teori informasi. Tidak ada OTP yang
+   "lebih kuat" secara matematis; mustahil. Yang BISA dan PERLU
+   diperkuat adalah sisi praktisnya: autentikasi, anti pemakaian
+   ulang pad, dan manajemen buku pad. Itu layak dibangun dari
+   awal, dan cocok sekali dengan use case radio Anda.
+4. UI saat ini sudah layak (dark theme, responsif, status
+   verifikasi jelas). Perbaikannya evolusioner, bukan prioritas.
+
+Urutan prioritas keseluruhan:
+  P0 = A (rantai pasok + self-test + header keamanan)
+  P1 = B (OTP naik kelas), C (mode radiogram/burst + enkripsi
+       file), D (buku kontak + verifikasi QR)
+  P2 = E (UI/UX), F (kualitas kode & tes)
+  P3 = G (riset jangka panjang)
+
+Estimasi usaha: S < 1 hari, M = 1–3 hari, L > 3 hari.
+
+
+=============================================================
+A. RANTAI PASOK & PENGERASAN HALAMAN  (P0)  — usaha: S–M
+=============================================================
+
+Masalah: 3 import dari https://esm.sh (script.js:26-28). Setiap
+pemuatan halaman, seluruh keamanan sistem bergantung pada esm.sh
+dan jalur jaringan mengirimkan JS yang jujur. Satu kompromi di
+CDN = kunci privat semua pengguna bisa dicuri. SRI tidak bisa
+dipakai untuk ES module dinamis lintas-origin secara andal.
+
+A.1 Vendor pustaka secara lokal
+  - Unduh dan simpan ke folder vendor/:
+      vendor/noble-post-quantum-0.7.0/ml-kem.js
+      vendor/noble-post-quantum-0.7.0/slh-dsa.js
+      vendor/noble-hashes-2.4.0/argon2.js (+ file dependensinya)
+  - Catat SHA-256 setiap file di vendor/HASHES.txt beserta URL
+    asal dan tanggal unduh, supaya bisa diaudit/diverifikasi
+    ulang kapan pun.
+  - Ganti import di script.js ke path lokal relatif.
+  - Bonus: aplikasi jadi 100% offline-capable (sinergi dengan
+    E.2 PWA, dan dengan disiplin "go dark" Anda).
+
+A.2 Self-test kripto saat startup
+  - Fungsi baru runCryptoSelfTest() yang dipanggil sebelum UI
+    aktif, berisi:
+      * HKDF-SHA256: test case 1 RFC 5869 (output harus cocok
+        persis dengan vektor resmi).
+      * AES-256-GCM: satu vektor NIST GCM (known answer).
+      * ML-KEM-768: keygen -> encapsulate -> decapsulate, rahasia
+        harus sama; minimal satu KAT resmi bila tersedia.
+      * SLH-DSA-SHA2-192s: sign -> verify harus valid; verifikasi
+        pesan yang diubah 1 bit harus GAGAL.
+      * X25519/Ed25519: round-trip deriveBits dan sign/verify.
+  - Jika ada yang gagal: kunci seluruh tombol aksi dan tampilkan
+    peringatan besar "SELF-TEST GAGAL — jangan pakai halaman ini"
+    (ini deteksi CDN/manipulasi file yang terkorupsi).
+  - Tampilkan status "self-test OK" kecil di footer.
+
+A.3 Content Security Policy
+  - Pindahkan blok <style> inline di index.html (baris 8-19) ke
+    style.css, lalu pasang CSP ketat:
+      default-src 'self'; script-src 'self'; style-src 'self';
+      connect-src 'none'; img-src 'self' data:
+  - Pasang lewat meta tag di index.html DAN header di serve.py.
+
+A.4 serve.py
+  - Tambah header: CSP di atas, X-Content-Type-Options: nosniff,
+    Referrer-Policy: no-referrer, Cache-Control: no-store untuk
+    index.html.
+  - Peringatan keras saat startup bila QEKH_BIND bukan 127.0.0.1:
+    HTTP Basic Auth mengirim kredensial base64 (setara cleartext)
+    ke seluruh LAN. Sarankan tetap localhost, atau pasang di
+    belakang TLS (mis. Caddy/stunnel) bila memang harus di-LAN.
+
+
+=============================================================
+B. SISTEM OTP NAIK KELAS  (P1)  — usaha: M
+=============================================================
+Posisi sekarang: tab "OTP (edukasi)" = XOR + pad acak CSPRNG.
+Secara teori itu sudah Shannon-perfect; yang kurang adalah
+ketahanan-pakai di dunia nyata. Rancangan baru dari awal:
+
+B.1 OTP Terautentikasi (menutup kelemahan OTP murni: bit-flip
+    tak terdeteksi)
+  - Format paket baru (JSON -> base64):
+      { v:"OTP-v2", padId:<16 byte b64>, off:<offset byte>,
+        ct:<base64>, tag:<base64 32 byte> }
+  - Tag dihitung SEBELUM pesan dipercaya; verifikasi dulu, baru
+    tampilkan plaintext (verify-then-decrypt).
+  - Opsi MAC:
+      (a) Praktis: HMAC-SHA256 dengan kunci 32 byte yang diambil
+          dari SEGMEN PAD TERPISAH (bukan segmen enkripsi).
+          Kuat secara komputasional — rekomendasi default.
+      (b) Information-theoretic murni: Wegman–Carter (universal
+          hash + kunci satu-kali). Lebih setia ke janji OTP,
+          tapi implementasi lebih rawan salah. Opsional.
+  - Jujur di UI: (a) menjadikan autentikasi "setara AES" kuatnya,
+    bukan lagi information-theoretic — dan itu tidak apa-apa.
+
+B.2 Buku Pad (pad book) — ini inti OTP lapangan
+  - Generator: hasilkan file .qpad, mis. 1 MB acak CSPRNG:
+      magic "QPAD1" | bookId 16B | jumlahSegmen | checksum SHA-256
+      | data acak
+  - Kedua pihak memegang salinan IDENTIK (ditukar sekali secara
+    aman/tatap muka — inilah harga mati OTP: distribusi kunci).
+  - Setiap pesan memakai segmen baru (padId + offset tercatat di
+    paket B.1), segmen terpakai ditandai dan TIDAK boleh dipakai
+    ulang.
+
+B.3 Anti pemakaian ulang pad (reuse = kematian OTP)
+  - Registry lokal (IndexedDB/localStorage): simpan hash setiap
+    segmen yang pernah dipakai kirim/terima.
+  - Enkripsi: otomatis ambil segmen baru; jika buku pad habis,
+    TOLAK mengenkripsi (jangan pernah diam-diam mengulang).
+  - Dekripsi: jika (padId, offset) sudah pernah dipakai untuk
+    pesan lain yang BERBEDA -> peringatan merah besar "PAD
+    TERDETEKSI DIPAKAI ULANG".
+  - Tombol "Musnahkan segmen terpakai" (zero-fill + hapus).
+
+B.4 Format manusiawi untuk radio
+  - Ekspor pad & ciphertext sebagai grup 5 HURUF KAPITAL
+    (mis. "KQXJD MNWAE ...") memakai base32 RFC 4648 (A–Z2–7,
+    ekspansi 1,6x) — bisa dibacakan lewat voice/CW dan disalin
+    tangan tanpa ambiguitas huruf besar/kecil.
+  - Fungsi: toLetterGroups(bytes) / fromLetterGroups(text),
+    toleran spasi dan huruf kecil saat parsing.
+
+
+=============================================================
+C. FITUR RADIO / BURST  (P1)  — usaha: M
+=============================================================
+Selaras dengan catatan lokasi pemancar Anda: ~80% pertahanan RDF
+adalah MEMANCAR SESINGKAT MUNGKIN. UI harus membantu disiplin itu.
+
+C.1 Mode Radiogram untuk ciphertext Q-EKH
+  - Ekspor ciphertext (sekarang base64 JSON) ke grup 5 huruf
+    kapital (base32, sama seperti B.4) + header pendek berisi
+    versi protokol.
+  - Estimasi waktu on-air: input laju bit (bps) atau WPM ->
+    tampilkan "perkiraan durasi pancar: X detik". Angka ini yang
+    dipakai untuk menilai risiko RDF sebelum memencet PTT.
+
+C.2 Enkripsi FILE, bukan hanya teks
+  - Chunked AEAD ala STREAM: header berisi nonce-prefix acak;
+    setiap chunk 64 KiB di-AES-GCM dengan nonce = prefix ||
+    counter || flagLAST; satu chunk rusak/terpotong = gagal total,
+    tidak ada plaintext parsial yang diam-diam lolos.
+  - Segel kunci file pakai konstruksi Q-EKH yang sudah ada
+    (kunci file acak 32B dienkripsi sebagai "pesan" v5).
+  - UI: drag & drop + tombol unduh hasil. Batas 16 MB teks tetap,
+    jalur file boleh jauh lebih besar.
+
+C.3 Opsi output biner mentah (tanpa base64)
+  - Hemat ~25% ukuran untuk toolchain radio milik sendiri.
+    Tetap sediakan base64/grup huruf sebagai default.
+
+
+=============================================================
+D. BUKU KONTAK & VERIFIKASI  (P1)  — usaha: M
+=============================================================
+Halaman "Tentang" Anda sudah benar menekankan: tanda tangan hanya
+berarti bila fingerprint diverifikasi lewat jalur terpisah.
+Masalahnya: sekarang pengguna harus MENEMPEL kunci manual setiap
+kali — rawan salah tempel (itulah celah MITM versi praktis).
+
+D.1 Buku alamat lokal (IndexedDB)
+  - Entri: nama, kunci publik JSON, fingerprint, status
+    verified (true/false), tanggal diverifikasi, catatan.
+  - Tab Enkripsi/Dekripsi: pilih kontak dari dropdown, bukan
+    tempel. Kontak belum verified -> label kuning "belum
+    diverifikasi", tombol enkripsi tetap jalan tapi dengan
+    peringatan (jangan dilarang total — kadang memang belum
+    sempat verifikasi).
+
+D.2 Verifikasi QR tatap muka
+  - Tampilkan fingerprint sebagai QR code (pustaka kecil
+    qrcode-generator, ikut divendor lokal sesuai A.1).
+  - Pindai QR kawan saat bertemu -> otomatis tandai verified.
+    Ini meniru alur "safety numbers" Signal dan membuat alur
+    anti-MITM Anda benar-benar bisa dipakai orang awam.
+
+D.3 Rotasi & masa berlaku kunci
+  - Field opsional "expires" di JSON kunci publik; UI
+    memperingatkan bila kunci kontak lewat tanggal itu.
+  - Alasan: tanpa ratchet (lihat G.1), kunci statis yang bocor
+    membuka SEMUA rekaman ciphertext masa lalu untuk identitas
+    itu. Rotasi berkala adalah jawaban praktisnya.
+
+
+=============================================================
+E. UI/UX  (P2)  — usaha: S–M
+=============================================================
+E.1 style.css saat ini terminifikasi menjadi 13 baris raksasa —
+    format ulang jadi terbaca per bagian (tanpa mengubah
+    tampilan sedikit pun), supaya bisa dirawat.
+E.2 PWA + offline penuh: manifest.webmanifest + service worker
+    yang meng-cache semua aset lokal. Setelah A.1 selesai,
+    aplikasi bisa "di-install" di HP dan jalan tanpa internet
+    sama sekali.
+E.3 Argon2id di Web Worker + indikator progres: sekarang UI
+    membeku ±2 detik saat membuat kunci ber-passphrase.
+E.4 Kenyamanan kecil: toast menggantikan alert()/confirm();
+    tombol "Unduh sebagai file" untuk kunci & ciphertext;
+    penghitung karakter + estimasi ukuran terenkripsi; toggle
+    tema terang/gelap (persist di localStorage).
+E.5 Aksesibilitas: aria-live pada status verifikasi, fokus
+    berpindah ke panel saat ganti tab, label aria untuk tombol
+    salin.
+E.6 i18n: saklar Bahasa Indonesia / English.
+
+
+=============================================================
+F. KUALITAS KODE  (P2)  — usaha: M
+=============================================================
+F.1 Pecah script.js (980 baris) menjadi: crypto.js (murni,
+    tanpa DOM), otp.js, ui.js. Logika kripto jadi bisa diuji
+    terpisah dari browser.
+F.2 Tes otomatis di Node: round-trip v3/v4/v5, tamper test
+    (ubah 1 byte ciphertext -> dekripsi HARUS gagal; ubah 1 byte
+    tanda tangan -> verifikasi HARUS gagal), uji vektor A.2,
+    uji batas (pesan kosong, 16 MB, base64 rusak, JSON rusak).
+    Jalankan di CI (GitHub Actions) setiap commit.
+F.3 Hapus kimi-debug-session_*.zip dari repo (masukkan ke
+    .gitignore) — tidak perlu ikut ter-commit.
+
+
+=============================================================
+G. JANGKA PANJANG / RISET  (P3)
+=============================================================
+G.1 Forward secrecy: saat ini tidak ada — by design, karena
+    kunci statis. Untuk komunikasi DUA arah, arah risetnya:
+    hybrid double ratchet (ratchet X25519 + rekey ML-KEM
+    berkala). Ini proyek besar tersendiri. Untuk siaran radio
+    SATU arah, ratchet praktis mustahil (butuh umpan balik) —
+    jawaban jujurnya tetap: rotasi kunci berkala (D.3) +
+    disiplin burst.
+G.2 Multi-penerima: inti pesan dienkripsi sekali dengan kunci
+    acak, lalu kunci itu disegel per penerima (blok KEM per
+    kontak) — seperti PGP mengirim ke banyak orang.
+G.3 Mode tanpa tanda tangan (deniable) sebagai OPSI sadar:
+    mengorbankan bukti keaslian demi plausible deniability.
+    Default tetap bertanda tangan.
+G.4 Bucket ukuran konstan (opsi "semua paket persis N blok"):
+    padding sekarang sudah bagus; bucket konstan adalah langkah
+    berikutnya melawan analisis ukuran yang lebih teliti.
+
+
+=============================================================
+ROADMAP YANG DISARANKAN
+=============================================================
+Tahap 1 (selesaikan dulu, paling penting):
+  A.1 vendor lokal + A.2 self-test + A.3 CSP + A.4 header serve.py
+Tahap 2: D.1 buku kontak + D.2 QR, C.1 mode radiogram
+Tahap 3: B.1–B.4 OTP terautentikasi + buku pad
+Tahap 4: E.2 PWA/offline + E.3 worker, F.1–F.2 tes otomatis
+Tahap 5 dan seterusnya: C.2 file, D.3, sisanya di E dan G
+
+Prinsip memandu (sama seperti catatan pemancar Anda):
+perbaikan terbesar ada di ARSITEKTUR dan KEBIASAAN — rantai
+pasok yang jujur, kunci yang diverifikasi manusia, pad yang
+tidak pernah dipakai ulang — bukan di algoritma baru.
+=============================================================
